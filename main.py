@@ -88,7 +88,7 @@ if __name__ == "__main__":
     db.create_tables()
     db.load_words()
 
-    token = ""
+    token = os.getenv("TOKEN")
     channel_id = 1225453961751035974
     intents = discord.Intents.default()
     intents.messages = True
