@@ -85,10 +85,10 @@ class WordGameClient(discord.Client):
 
 if __name__ == "__main__":
     db = WordGameDB()
-    db.create_tables()
-    db.load_words()
+    # db.create_tables()
+    # db.load_words()
 
-    token = os.getenv("TOKEN")
+    token = os.getenv("TOKEN", "MTIyNTQ5MDc1OTQzMjc5ODMyMA.GBK0hM.7cIV6gluTopYAOsmtbYD0hkvmgChVAeYTWJDdg")
     channel_id = 1225453961751035974
     intents = discord.Intents.default()
     intents.messages = True
