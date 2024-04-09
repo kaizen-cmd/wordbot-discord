@@ -71,6 +71,8 @@ class WordGameClient(discord.Client):
                     score = self.db.update_score(message.author, len(words[0]))
                     await message.add_reaction("✅")
                     await message.channel.send(content=f"+{len(message.content)} points! {message.author.display_name}'s score {score}")
+                elif result == "NYT":
+                    await message.channel.send("Not your turn")
                 elif result == "WAU":
                     await message.add_reaction("❌")
                     await message.channel.send("Word already used")
@@ -80,8 +82,6 @@ class WordGameClient(discord.Client):
                 elif result == "WFCNM":
                     await message.add_reaction("❌")
                     await message.channel.send("Word's first character does not match the previous word's character")
-                elif result == "NYT":
-                    await message.channel.send("Not your turn")
 
 if __name__ == "__main__":
     db = WordGameDB()
