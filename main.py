@@ -101,8 +101,8 @@ class WordGameClient(discord.Client):
             word = words[0]
             return word.isalpha()
 
-    async def on_message(self, message: str):
-        if self.validate_message(message):
+    async def on_message(self, message: discord.message.Message):
+        if self.validate_message(message.content):
             message = message.lower()
             result = self.db.try_play_word(message, message.author)
             if result == "WA":
