@@ -54,8 +54,8 @@ class WordGameDB:
         return score
 
     def try_play_word(self, message):
-        word = message.content
-        user = word.author
+        word = message.content.lower()
+        user = message.author
         lastchar = self.curr.execute(
             "SELECT lastchar FROM last_char WHERE id=1"
         ).fetchone()[0]
@@ -95,7 +95,7 @@ class WordGameClient(discord.Client):
     def validate_message(self, message):
         if message.author == self.user or message.channel.id != CHANNEL_ID:
             return False
-        words = message.content.split(" ")
+        words = message.content.lower().split(" ")
         if len(words) > 1:
             return False
         word = words[0]
@@ -103,7 +103,6 @@ class WordGameClient(discord.Client):
 
     async def on_message(self, message: discord.message.Message):
         if self.validate_message(message):
-            message = message.lower()
             result = self.db.try_play_word(message)
             if result == "WA":
                 score = self.db.update_score(message)
