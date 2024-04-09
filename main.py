@@ -199,8 +199,11 @@ if __name__ == "__main__":
             )
             if response.status_code == 400:
                 await ctx.response.send_message("Meaning of this word not found")
-            meaning = response.json()[0]["meanings"][0]["definitions"][0]["definition"]
-            await ctx.response.send_message(f"`{word}: {meaning}`")
+            try:
+                meaning = response.json()[0]["meanings"][0]["definitions"][0]["definition"]
+                await ctx.response.send_message(f"`{word}: {meaning}`")
+            except:
+                await ctx.response.send_message(f"Sorry pal! No meaning found for this word. Could be a proper noun")
             return
         await ctx.response.send_message("Invalid word")
 
