@@ -66,14 +66,14 @@ class WordGameDB:
             "SELECT word, isUsed FROM words WHERE word=?", (word,)
         ).fetchone()
 
-        if not db_word:
+        if last_user != 0 and user.id == last_user:
+            return "NYT"  # Not this user's turn
+        elif not db_word:
             return "WND"  # Word not in the dictionary
         elif lastchar and word[0] != lastchar:
             return "WFCNM"  # Word's first character does not match the last character
         elif db_word[1] == 1:
             return "WAU"  # Word is already used
-        elif last_user != 0 and user.id == last_user:
-            return "NYT"  # Not this user's turn
         else:
             self.curr.execute("UPDATE words SET isUsed=1 WHERE word=?", (word,))
             self.curr.execute("UPDATE last_char SET lastchar=? WHERE id=1", (word[-1],))
