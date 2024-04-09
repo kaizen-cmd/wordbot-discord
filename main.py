@@ -35,7 +35,9 @@ class WordGameDB:
             self.curr.executemany("INSERT INTO words (word) VALUES (?)", words)
             self.conn.commit()
 
-    def update_score(self, user, points):
+    def update_score(self, message):
+        user = message.author
+        points = len(message.content)
         score = self.curr.execute(
             f"SELECT score FROM users WHERE id=?", (user.id,)
         ).fetchone()
@@ -51,7 +53,9 @@ class WordGameDB:
         self.conn.commit()
         return score
 
-    def try_play_word(self, word, user):
+    def try_play_word(self, message):
+        word = message.content
+        user = word.author
         lastchar = self.curr.execute(
             "SELECT lastchar FROM last_char WHERE id=1"
         ).fetchone()[0]
@@ -83,7 +87,7 @@ class WordGameDB:
 class WordGameClient(discord.Client):
     def __init__(self, db, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.db = db
+        self.db: WordGameDB = db
 
     async def on_ready(self):
         print(f"We have logged in as {self.user}")
@@ -91,22 +95,18 @@ class WordGameClient(discord.Client):
     def validate_message(self, message):
         if message.author == self.user or message.channel.id != CHANNEL_ID:
             return False
-        try:
-            message = int("message")
+        words = message.content.split(" ")
+        if len(words) > 1:
             return False
-        except:
-            words = message.split(" ")
-            if len(words) > 1:
-                return False
-            word = words[0]
-            return word.isalpha()
+        word = words[0]
+        return word.isalpha()
 
     async def on_message(self, message: discord.message.Message):
-        if self.validate_message(message.content):
+        if self.validate_message(message):
             message = message.lower()
-            result = self.db.try_play_word(message, message.author)
+            result = self.db.try_play_word(message)
             if result == "WA":
-                score = self.db.update_score(message.author, len(message))
+                score = self.db.update_score(message)
                 await message.add_reaction("✅")
                 await message.channel.send(
                     content=f"+{len(message.content)} points! {message.author.display_name}'s score {score}"
