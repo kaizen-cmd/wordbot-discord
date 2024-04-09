@@ -205,7 +205,7 @@ if __name__ == "__main__":
         await ctx.response.send_message("Invalid word")
 
     @client.tree.command(name="help")
-    async def meaning(ctx: discord.Interaction):
+    async def help(ctx: discord.Interaction):
         await ctx.response.send_message(
             """
 Wordchain Rules
