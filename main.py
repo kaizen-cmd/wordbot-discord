@@ -139,4 +139,4 @@ if __name__ == "__main__":
     intents.messages = True
     intents.message_content = True
     client = WordGameClient(db, intents=intents)
-    # client.run(token)
+    client.run(token)
