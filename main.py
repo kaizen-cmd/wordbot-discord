@@ -203,7 +203,7 @@ if __name__ == "__main__":
                 meaning = response.json()[0]["meanings"][0]["definitions"][0]["definition"]
                 await ctx.response.send_message(f"`{word}: {meaning}`")
             except:
-                await ctx.response.send_message(f"Sorry pal! No meaning found for this word. Could be a proper noun")
+                await ctx.response.send_message(f"Sorry pal! No meaning found for **{word}**. It could be a proper noun.")
             return
         await ctx.response.send_message("Invalid word")
 
