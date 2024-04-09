@@ -204,4 +204,22 @@ if __name__ == "__main__":
             return
         await ctx.response.send_message("Invalid word")
 
+    @client.tree.command(name="help")
+    async def meaning(ctx: discord.Interaction):
+        await ctx.response.send_message(
+            """
+Wordchain Rules
+**1**. Check the previous accepted word.
+**2**. Using the last letter of that write a new word.
+**3**. If the word gets accepted, you get points equal to the number characters in that word.
+**4**. If you fail to follow the 2nd rule, **2 points will be deducted**.
+Commands
+```
+/myscore
+/score
+/meaning <word>
+```
+"""
+        )
+
     client.run(token)
