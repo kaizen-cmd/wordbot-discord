@@ -173,7 +173,7 @@ class MultiServerWordChainDB:
 
     def leaderboard(self, server_id):
         user_table = self.get_users_table_name(server_id)
-        QUERY = f"SELECT id, score FROM {user_table} ORDER BY score DESC LIMIT 10"
+        QUERY = f"SELECT id, score FROM {user_table} ORDER BY score DESC LIMIT 5"
         user_rows = self.curr.execute(QUERY).fetchall()
         if not user_rows:
             return (False, "Start playing")
