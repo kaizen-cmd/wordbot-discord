@@ -1,1 +1,5 @@
 venv
+.vscode
+db.sqlite3
+__pycache__
+app.log
