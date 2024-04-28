@@ -3,3 +3,4 @@ venv
 db.sqlite3
 __pycache__
 app.log
+database_backup.sqlite3
