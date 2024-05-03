@@ -1,5 +1,6 @@
 from WordChainClient import client
 import logging
+import os
 
 logging.basicConfig(
     filename="app.log",
@@ -23,8 +24,6 @@ class App:
 
 
 if __name__ == "__main__":
-    app = App(
-        "MTIyNTQ5MDc1OTQzMjc5ODMyMA.GBK0hM.7cIV6gluTopYAOsmtbYD0hkvmgChVAeYTWJDdg"
-    )
+    app = App(os.getenv("BOT_TOKEN"))
     logger.info("Started Wordchain instance")
     app.run()
