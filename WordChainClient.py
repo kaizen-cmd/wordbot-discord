@@ -36,6 +36,17 @@ class WordChainClient(commands.Bot):
 
     async def on_message(self, message: discord.message.Message):
 
+        if (
+            message.mentions
+            and message.mentions[0].id == self.user.id
+            and "activate" in message.content
+        ):
+            self.server_channel_mapping[str(message.guild.id)] = message.channel.id
+            f = open("server_channel_mapping.json", "w")
+            f.write(json.dumps(self.server_channel_mapping))
+            f.close()
+            await message.channel.send("Wordchain activated, type a word ✅ ")
+
         server = message.guild
         if not self.db.is_server_onboard(server.id):
             self.db.onboard_server(server.id)
