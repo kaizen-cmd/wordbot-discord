@@ -1,6 +1,6 @@
+import logging
 import sqlite3
 from collections import defaultdict
-import logging
 
 logger = logging.getLogger(__name__)
 

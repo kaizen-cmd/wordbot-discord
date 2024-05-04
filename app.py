@@ -1,6 +1,7 @@
-from WordChainClient import client
 import logging
 import os
+
+from WordChainClient import client
 
 logging.basicConfig(
     filename="app.log",

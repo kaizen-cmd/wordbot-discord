@@ -1,10 +1,12 @@
-import discord
-from discord.ext import commands
-from MultiServerWordChainDB import MultiServerWordChainDB
 import json
-from discord import app_commands
-import requests
 import logging
+
+import discord
+import requests
+from discord import app_commands
+from discord.ext import commands
+
+from MultiServerWordChainDB import MultiServerWordChainDB
 
 logger = logging.getLogger(__name__)
 
