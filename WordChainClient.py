@@ -51,6 +51,9 @@ class WordChainClient(commands.Bot):
         if not self.db.is_server_onboard(server.id):
             self.db.onboard_server(server.id)
             logger.info(f"On boarded server {server.id}")
+            await self.get_channel(1236196728613371966).send(
+                f"Server {message.guild.name} on boarded"
+            )
 
         content = message.content
         if not WordChainClient.validate_message(content):
