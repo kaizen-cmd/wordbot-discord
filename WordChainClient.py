@@ -72,15 +72,25 @@ class WordChainClient(commands.Bot):
                 try:
                     # prod message
                     await client.get_channel(1236196728613371966).send(
-                        f"Server {message.guild.name} de boarded"
+                        f"Server {message.guild.name} de-activated"
                     )
                 except:
                     # test message
                     await client.get_channel(1234117670996148246).send(
-                        f"Server {message.guild.name} de boarded"
+                        f"Server {message.guild.name} de-activated"
                     )
 
         else:
+
+            content = message.content
+            content = content.lower()
+            if not WordChainClient.validate_message(content):
+                return
+
+            channel = message.channel
+            if self.server_channel_mapping.get(str(server.id)) != channel.id:
+                return
+
             server = message.guild
             if not self.db.is_server_onboard(server.id):
                 self.db.onboard_server(server.id)
@@ -94,16 +104,6 @@ class WordChainClient(commands.Bot):
                     await self.get_channel(1234117670996148246).send(
                         f"Server {message.guild.name} on boarded"
                     )
-
-            content = message.content
-            if not WordChainClient.validate_message(content):
-                return
-
-            content = content.lower()
-
-            channel = message.channel
-            if self.server_channel_mapping.get(str(server.id)) != channel.id:
-                return
 
             result, string_message = self.db.try_play_word(
                 server_id=server.id, word=content, player_id=author.id
@@ -125,12 +125,12 @@ class WordChainClient(commands.Bot):
         try:
             # prod message
             await self.get_channel(1236196728613371966).send(
-                f"Server {server.name} de boarded"
+                f"Server {server.name} kicked the bot"
             )
         except:
             # test message
             await self.get_channel(1234117670996148246).send(
-                f"Server {server.name} de boarded"
+                f"Server {server.name} kicked the bot"
             )
 
 
