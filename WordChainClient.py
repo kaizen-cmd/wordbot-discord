@@ -81,7 +81,7 @@ class WordChainClient(commands.Bot):
 
         else:
             await message.add_reaction("❌")
-            await channel.send(string_message)
+            await message.reply(string_message)
 
 
 intents = discord.Intents.default()
