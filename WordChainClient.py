@@ -1,5 +1,4 @@
 import json
-import logging
 
 import discord
 import requests
@@ -8,7 +7,6 @@ from discord.ext import commands
 
 from MultiServerWordChainDB import MultiServerWordChainDB
 
-logger = logging.getLogger(__name__)
 
 db = MultiServerWordChainDB()
 
@@ -24,7 +22,10 @@ class WordChainClient(commands.Bot):
         f.close()
 
     async def on_ready(self):
-        synced = await self.tree.sync()
+        try:
+            await self.tree.sync()
+        except:
+            pass
 
     @staticmethod
     def validate_message(content: str):
@@ -36,52 +37,101 @@ class WordChainClient(commands.Bot):
 
     async def on_message(self, message: discord.message.Message):
 
-        if (
-            message.mentions
-            and message.mentions[0].id == self.user.id
-            and "activate" in message.content
-        ):
-            self.server_channel_mapping[str(message.guild.id)] = message.channel.id
-            f = open("server_channel_mapping.json", "w")
-            f.write(json.dumps(self.server_channel_mapping))
-            f.close()
-            await message.channel.send("Wordchain activated, type a word ✅ ")
-
-        server = message.guild
-        if not self.db.is_server_onboard(server.id):
-            self.db.onboard_server(server.id)
-            logger.info(f"On boarded server {server.id}")
-            await self.get_channel(1236196728613371966).send(
-                f"Server {message.guild.name} on boarded"
-            )
-
-        content = message.content
-        if not WordChainClient.validate_message(content):
-            return
-
-        content = content.lower()
         author = message.author
         if author.id == self.user.id:
             return
 
-        channel = message.channel
-        if self.server_channel_mapping.get(str(server.id)) != channel.id:
-            return
+        if (
+            message.mentions
+            and message.mentions[0].id == self.user.id
+            and len(message.content.split(" ")) == 2
+        ):
+            if message.content.split(" ")[1] == "activate":
+                self.server_channel_mapping[str(message.guild.id)] = message.channel.id
+                f = open("server_channel_mapping.json", "w")
+                f.write(json.dumps(self.server_channel_mapping))
+                f.close()
+                await message.channel.send("Wordchain activated, type a word ✅ ")
 
-        result, string_message = self.db.try_play_word(
-            server_id=server.id, word=content, player_id=author.id
-        )
-
-        if result:
-            await message.add_reaction("✅")
-            if len(string_message) == 1:
-                await channel.send(
-                    f"Words beginning with {content[-1]} are over. New character is {string_message}"
+            elif (
+                message.content.split(" ")[1] == "deactivate"
+                and message.author.id == 462682564281499659  # slav's user id
+            ):
+                if client.server_channel_mapping.get(str(message.guild.id)):
+                    del client.server_channel_mapping[str(message.guild.id)]
+                    f = open("server_channel_mapping.json", "w")
+                    f.write(json.dumps(client.server_channel_mapping))
+                    f.close()
+                try:
+                    db.deboard_server(server_id=message.guild.id)
+                except Exception as e:
+                    pass
+                await message.channel.send(
+                    "Wordchain resetted and deactivated  ⭕️, `/activate to reactivate`"
                 )
+                try:
+                    # prod message
+                    await client.get_channel(1236196728613371966).send(
+                        f"Server {message.guild.name} de boarded"
+                    )
+                except:
+                    # test message
+                    await client.get_channel(1234117670996148246).send(
+                        f"Server {message.guild.name} de boarded"
+                    )
 
         else:
-            await message.add_reaction("❌")
-            await message.reply(string_message)
+            server = message.guild
+            if not self.db.is_server_onboard(server.id):
+                self.db.onboard_server(server.id)
+                try:
+                    # prod message
+                    await self.get_channel(1236196728613371966).send(
+                        f"Server {message.guild.name} on boarded"
+                    )
+                except:
+                    # test message
+                    await self.get_channel(1234117670996148246).send(
+                        f"Server {message.guild.name} on boarded"
+                    )
+
+            content = message.content
+            if not WordChainClient.validate_message(content):
+                return
+
+            content = content.lower()
+
+            channel = message.channel
+            if self.server_channel_mapping.get(str(server.id)) != channel.id:
+                return
+
+            result, string_message = self.db.try_play_word(
+                server_id=server.id, word=content, player_id=author.id
+            )
+
+            if result:
+                await message.add_reaction("✅")
+                if len(string_message) == 1:
+                    await channel.send(
+                        f"Words beginning with {content[-1]} are over. New character is {string_message}"
+                    )
+
+            else:
+                await message.add_reaction("❌")
+                await message.reply(string_message)
+
+    async def on_guild_remove(self, server: discord.guild.Guild):
+        self.db.deboard_server(server.id)
+        try:
+            # prod message
+            await self.get_channel(1236196728613371966).send(
+                f"Server {server.name} de boarded"
+            )
+        except:
+            # test message
+            await self.get_channel(1234117670996148246).send(
+                f"Server {server.name} de boarded"
+            )
 
 
 intents = discord.Intents.default()

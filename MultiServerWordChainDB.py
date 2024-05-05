@@ -72,6 +72,19 @@ class MultiServerWordChainDB:
             self.curr.executemany(f"INSERT INTO {word_table} (word) VALUES (?)", words)
             self.conn.commit()
 
+        logger.info(f"On boarded server {server_id}")
+
+    def deboard_server(self, server_id):
+        user_table = self.get_users_table_name(server_id)
+        word_table = self.get_words_table_name(server_id)
+        last_char_user_table = self.get_last_char_user_table_name(server_id)
+
+        self.curr.execute(f"DROP TABLE {word_table}")
+        self.curr.execute(f"DROP TABLE {user_table}")
+        self.curr.execute(f"DROP TABLE {last_char_user_table}")
+        self.conn.commit()
+        logger.info(f"De boarded server {server_id}")
+
     def try_play_word(self, server_id, player_id, word):
 
         user_table = self.get_users_table_name(server_id)

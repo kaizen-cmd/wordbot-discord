@@ -9,8 +9,7 @@ import os
 import json
 import argparse
 
-
-f = open("server_channel_mapping.json", "r")
+f = open("./server_channel_mapping.json", "r")
 server_channel_mapping = json.loads(f.read())
 f.close()
 headers = {
@@ -45,8 +44,8 @@ def broadcast(message="Hello!"):
         "https://discord.com/api/v9/users/@me/guilds", headers=headers
     )
     servers = response.json()
-    for servers in servers:
-        server_id = servers["id"]
+    for server in servers:
+        server_id = server["id"]
         channel_id = server_channel_mapping.get(server_id)
         if channel_id:
             data = {"content": message}
