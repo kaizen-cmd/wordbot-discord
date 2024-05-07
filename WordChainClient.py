@@ -1,4 +1,5 @@
 import json
+import os
 
 import discord
 import requests
@@ -8,14 +9,15 @@ from discord.ext import commands
 from MultiServerWordChainDB import MultiServerWordChainDB
 
 
-db = MultiServerWordChainDB()
-
-
 class WordChainClient(commands.Bot):
+
+    SLAV_USER_ID = int(os.getenv("SLAV_USER_ID"))
+    SUPPORT_SERVER_ID = int(os.getenv("SUPPORT_SERVER_ID"))
+    SUPPORT_SERVER_LOG_CHANNEL_ID = int(os.getenv("SUPPORT_SERVER_LOG_CHANNEL_ID"))
+
     def __init__(self, *args, **kwargs):
-        global db
         super().__init__(*args, **kwargs)
-        self.db = db
+        self.db = MultiServerWordChainDB()
 
         f = open("server_channel_mapping.json", "r")
         self.server_channel_mapping = json.loads(f.read())
@@ -26,14 +28,6 @@ class WordChainClient(commands.Bot):
             await self.tree.sync()
         except:
             pass
-
-    @staticmethod
-    def validate_message(content: str):
-        words = content.lower().split(" ")
-        if len(words) > 1:
-            return False
-        word = words[0]
-        return word.isalpha()
 
     async def on_message(self, message: discord.message.Message):
 
@@ -47,57 +41,19 @@ class WordChainClient(commands.Bot):
             and len(message.content.split(" ")) == 2
         ):
             if message.content.split(" ")[1] == "activate":
-                self.server_channel_mapping[str(message.guild.id)] = message.channel.id
-                f = open("server_channel_mapping.json", "w")
-                f.write(json.dumps(self.server_channel_mapping))
-                f.close()
-                server = message.guild
-                if not self.db.is_server_onboard(server.id):
-                    self.db.onboard_server(server.id)
-                await message.channel.send("Wordchain activated, type a word ✅ ")
-                try:
-                    # prod message
-                    await self.get_channel(1236196728613371966).send(
-                        f"Server {message.guild.name} on boarded"
-                    )
-                except:
-                    # test message
-                    await self.get_channel(1234117670996148246).send(
-                        f"Server {message.guild.name} on boarded"
-                    )
+                await self._activate_bot(message)
 
             elif (
                 message.content.split(" ")[1] == "deactivate"
-                and message.author.id == 462682564281499659  # slav's user id
+                and message.author.id == WordChainClient.SLAV_USER_ID
             ):
-                if client.server_channel_mapping.get(str(message.guild.id)):
-                    del client.server_channel_mapping[str(message.guild.id)]
-                    f = open("server_channel_mapping.json", "w")
-                    f.write(json.dumps(client.server_channel_mapping))
-                    f.close()
-                try:
-                    db.deboard_server(server_id=message.guild.id)
-                except Exception as e:
-                    pass
-                await message.channel.send(
-                    "Wordchain resetted and deactivated  ⭕️, `/activate to reactivate`"
-                )
-                try:
-                    # prod message
-                    await client.get_channel(1236196728613371966).send(
-                        f"Server {message.guild.name} de-activated"
-                    )
-                except:
-                    # test message
-                    await client.get_channel(1234117670996148246).send(
-                        f"Server {message.guild.name} de-activated"
-                    )
+                await self._deactivate_bot(message)
 
         else:
 
             content = message.content
             content = content.lower()
-            if not WordChainClient.validate_message(content):
+            if not self._validate_message(content):
                 return
 
             server = message.guild
@@ -122,16 +78,56 @@ class WordChainClient(commands.Bot):
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         self.db.deboard_server(server.id)
+        await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
+            f"Server {server.name} kicked the bot"
+        )
+
+    async def _deactivate_bot(self, message: discord.Message):
+        if client.server_channel_mapping.get(str(message.guild.id)):
+            del client.server_channel_mapping[str(message.guild.id)]
+            f = open("server_channel_mapping.json", "w")
+            f.write(json.dumps(client.server_channel_mapping))
+            f.close()
         try:
-            # prod message
-            await self.get_channel(1236196728613371966).send(
-                f"Server {server.name} kicked the bot"
+            self.db.deboard_server(server_id=message.guild.id)
+        except Exception as e:
+            pass
+        await message.channel.send(
+            "Wordchain resetted and deactivated  ⭕️, `@WordChainAdmin activate` to reactivate"
+        )
+        if (
+            message.guild.id != WordChainClient.SUPPORT_SERVER_ID
+            or self.user.name == "word-chain-test"
+        ):
+            await client.get_channel(
+                WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID
+            ).send(f"Server {message.guild.name} de-activated")
+
+    async def _activate_bot(self, message: discord.Message):
+        self.server_channel_mapping[str(message.guild.id)] = message.channel.id
+        f = open("server_channel_mapping.json", "w")
+        f.write(json.dumps(self.server_channel_mapping))
+        f.close()
+        server = message.guild
+        if not self.db.is_server_onboard(server.id):
+            self.db.onboard_server(server.id)
+        await message.channel.send(
+            "Wordchain activated, type a word ✅ , ```/help for rules```"
+        )
+        if (
+            server.id != WordChainClient.SUPPORT_SERVER_ID
+            or self.user.name == "word-chain-test"
+        ):
+            await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
+                f"Server {message.guild.name} on boarded"
             )
-        except:
-            # test message
-            await self.get_channel(1234117670996148246).send(
-                f"Server {server.name} kicked the bot"
-            )
+
+    def _validate_message(self, content: str):
+        words = content.lower().split(" ")
+        if len(words) > 1:
+            return False
+        word = words[0]
+        return word.isalpha()
 
 
 intents = discord.Intents.default()
@@ -142,7 +138,7 @@ client = WordChainClient(intents=intents, command_prefix="/")
 
 @client.tree.command(name="myscore")
 async def myscore(ctx: discord.Interaction):
-    result, data = db.get_score(ctx.guild.id, ctx.user.id)
+    result, data = client.db.get_score(ctx.guild.id, ctx.user.id)
     if not result:
         await ctx.response.send_message(data)
         return
@@ -153,7 +149,7 @@ async def myscore(ctx: discord.Interaction):
 
 @client.tree.command(name="score")
 async def score(ctx: discord.Interaction):
-    result, data = db.leaderboard(ctx.guild.id)
+    result, data = client.db.leaderboard(ctx.guild.id)
     if not result:
         await ctx.response.send_message(data)
         return

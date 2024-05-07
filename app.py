@@ -2,6 +2,12 @@ import logging
 import os
 
 from WordChainClient import client
+from dotenv import load_dotenv
+
+if ".env" not in os.listdir():
+    raise Exception(".env not found")
+
+load_dotenv(".env")
 
 logging.basicConfig(
     filename="app.log",

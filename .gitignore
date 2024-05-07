@@ -6,3 +6,4 @@ app.log
 database_backup.sqlite3
 server_channel_mapping.json
 website
+*.env
