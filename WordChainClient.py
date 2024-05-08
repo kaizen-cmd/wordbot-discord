@@ -69,7 +69,7 @@ class WordChainClient(commands.Bot):
                 await message.add_reaction("✅")
                 if len(string_message) == 1:
                     await channel.send(
-                        f"Words beginning with {content[-1]} are over. New character is {string_message}"
+                        f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
                     )
 
             else:

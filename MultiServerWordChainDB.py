@@ -24,6 +24,10 @@ class MultiServerWordChainDB:
             server_id = "_".join(table_name.split("_")[0:-1])
             self.server_table_mapping[server_id].append(table_name)
 
+    def __del__(self):
+        self.curr.close()
+        self.conn.close()
+
     def get_users_table_name(self, server_id):
         return f"users_{server_id}"
 
@@ -170,6 +174,11 @@ class MultiServerWordChainDB:
                     f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{i}%' LIMIT 1"
                 ).fetchone()
                 if next_word_exists:
+                    self.curr.execute(
+                        f"UPDATE {last_char_user_table} SET last_char=? WHERE id=1",
+                        (i),
+                    )
+                    self.conn.commit()
                     return (True, i)
 
         return (True, "Word accepted")
