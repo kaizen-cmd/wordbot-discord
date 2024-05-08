@@ -1,6 +1,7 @@
 import logging
 import sqlite3
 from collections import defaultdict
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class MultiServerWordChainDB:
         self.marks_for_word_length_gte_seven = 6
         self.marks_for_word_length_lte_seven = 4
         self.marks_for_same_start_end_word = 2
+        self.char_list = list("abcdefghijklmnopqrstuvwxyz")
 
         # Populate server_table_mapping with existing tables in the database
         self.curr.execute("SELECT name FROM sqlite_master WHERE type='table'")
@@ -169,7 +171,8 @@ class MultiServerWordChainDB:
             f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{word[-1]}%' LIMIT 1"
         ).fetchone()
         if not next_word_exists:
-            for i in "abcdefghijklmnopqrstuvwxyz":
+            random.shuffle(self.char_list)
+            for i in self.char_list:
                 next_word_exists = self.curr.execute(
                     f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{i}%' LIMIT 1"
                 ).fetchone()
