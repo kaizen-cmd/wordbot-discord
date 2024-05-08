@@ -43,9 +43,9 @@ class WordChainClient(commands.Bot):
             if message.content.split(" ")[1] == "activate":
                 await self._activate_bot(message)
 
-            elif (
-                message.content.split(" ")[1] == "deactivate"
-                and message.author.id == WordChainClient.SLAV_USER_ID
+            elif message.content.split(" ")[1] == "deactivate" and (
+                message.author.id == WordChainClient.SLAV_USER_ID
+                or message.author.guild_permissions.administrator
             ):
                 await self._deactivate_bot(message)
 
@@ -68,7 +68,7 @@ class WordChainClient(commands.Bot):
             if result:
                 await message.add_reaction("✅")
                 if len(string_message) == 1:
-                    await channel.send(
+                    await message.reply(
                         f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
                     )
 
