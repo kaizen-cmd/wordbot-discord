@@ -43,9 +43,9 @@ class WordChainClient(commands.Bot):
             if message.content.split(" ")[1] == "activate":
                 await self._activate_bot(message)
 
-            elif message.content.split(" ")[1] == "deactivate" and (
-                message.author.id == WordChainClient.SLAV_USER_ID
-                or message.author.guild_permissions.administrator
+            elif (
+                message.content.split(" ")[1] == "deactivate"
+                and message.author.guild_permissions.administrator
             ):
                 await self._deactivate_bot(message)
 
