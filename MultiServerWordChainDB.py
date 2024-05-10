@@ -171,18 +171,7 @@ class MultiServerWordChainDB:
             f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{word[-1]}%' LIMIT 1"
         ).fetchone()
         if not next_word_exists:
-            random.shuffle(self.char_list)
-            for i in self.char_list:
-                next_word_exists = self.curr.execute(
-                    f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{i}%' LIMIT 1"
-                ).fetchone()
-                if next_word_exists:
-                    self.curr.execute(
-                        f"UPDATE {last_char_user_table} SET last_char=? WHERE id=1",
-                        (i),
-                    )
-                    self.conn.commit()
-                    return (True, i)
+            return (True, self._change_letter(server_id=server_id))
 
         return (True, "Word accepted")
 
@@ -208,3 +197,21 @@ class MultiServerWordChainDB:
             id, score = user_row
             result.append((rank, id, score))
         return (True, result)
+
+    def _change_letter(self, server_id):
+
+        word_table = self.get_words_table_name(server_id)
+        last_char_user_table = self.get_last_char_user_table_name(server_id)
+
+        random.shuffle(self.char_list)
+        for i in self.char_list:
+            next_word_exists = self.curr.execute(
+                f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{i}%' LIMIT 1"
+            ).fetchone()
+            if next_word_exists:
+                self.curr.execute(
+                    f"UPDATE {last_char_user_table} SET last_char=? WHERE id=1",
+                    (i),
+                )
+                self.conn.commit()
+                return i
