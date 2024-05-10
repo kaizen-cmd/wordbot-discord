@@ -44,9 +44,7 @@ class WordChainClient(commands.Bot):
             if message.content.split(" ")[1] == "activate":
                 await self._activate_bot(message)
 
-            elif (
-                message.content.split(" ")[1] == "deactivate"
-            ):
+            elif message.content.split(" ")[1] == "deactivate":
                 await self._deactivate_bot(message)
 
             elif (
@@ -89,12 +87,15 @@ class WordChainClient(commands.Bot):
         )
 
     async def _exhaust_words_beginning_with(self, message: discord.Message):
+        old_letter = message.content.split(" ")[2]
         self.db.curr.execute(
-            f"UPDATE words_{message.guild.id} SET isUsed=1 WHERE word LIKE '{message.content.split(" ")[2]}%'"
+            f"UPDATE words_{message.guild.id} SET isUsed=1 WHERE word LIKE '{old_letter}%'"
         ).fetchone()
         self.db.conn.commit()
         new_letter = self.db._change_letter(server_id=message.guild.id)
-        await message.reply(f"Words starting with `{message.content.split(' ')[2]}` exhausted. A new letter will be suggested whenever a word ends in this letter. New letter is `{new_letter}`")
+        await message.reply(
+            f"Words starting with `{old_letter}` exhausted. A new letter will be suggested whenever a word ends in this letter. New letter is `{new_letter}`"
+        )
 
     async def _deactivate_bot(self, message: discord.Message):
         if client.server_channel_mapping.get(str(message.guild.id)):
