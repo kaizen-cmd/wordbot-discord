@@ -112,10 +112,10 @@ class WordChainClient(commands.Bot):
         )
 
     async def _deactivate_bot(self, message: discord.Message):
-        if client.server_channel_mapping.get(str(message.guild.id)):
-            del client.server_channel_mapping[str(message.guild.id)]
+        if self.server_channel_mapping.get(str(message.guild.id)):
+            del self.server_channel_mapping[str(message.guild.id)]
             f = open("server_channel_mapping.json", "w")
-            f.write(json.dumps(client.server_channel_mapping))
+            f.write(json.dumps(self.server_channel_mapping))
             f.close()
         try:
             self.db.deboard_server(server_id=message.guild.id)
@@ -128,9 +128,9 @@ class WordChainClient(commands.Bot):
             message.guild.id != WordChainClient.SUPPORT_SERVER_ID
             or self.user.name == "word-chain-test"
         ):
-            await client.get_channel(
-                WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID
-            ).send(f"Server {message.guild.name} de-activated")
+            await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
+                f"Server {message.guild.name} de-activated"
+            )
 
     async def _activate_bot(self, message: discord.Message):
         self.server_channel_mapping[str(message.guild.id)] = message.channel.id
@@ -228,12 +228,18 @@ class WordChainClient(commands.Bot):
             "**5**. 6 or lesser characters in the word = 4 points.\n"
             "**6**. Same starting and ending letter = Additional 2 points.\n"
             "**7**. Out of turn, wrong word in the chain = **2 points will be deducted**.\n"
-            "**8**. Word length has to be greater than 3.\n"
-            "Commands\n"
+            "**8**. Word length has to be greater than 3.\n\n"
+            "**User Commands**\n"
             "```\n"
             "@WordChainAdmin myscore\n"
             "@WordChainAdmin score\n"
             "@WordChainAdmin meaning <word>\n"
+            "```\n\n"
+            "**Admin Commands**\n"
+            "```\n"
+            "@WordChainAdmin activate\n"
+            "@WordChainAdmin deactivate\n"
+            "@WordChainAdmin exhaust <letter> - End words beginning with <letter>\n"
             "```\n"
             "Support server: https://discord.gg/ftZJcGvsvP"
         )
