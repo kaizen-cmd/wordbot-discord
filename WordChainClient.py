@@ -39,19 +39,28 @@ class WordChainClient(commands.Bot):
             message.mentions
             and message.mentions[0].id == self.user.id
             and len(message.content.split(" ")) > 1
-            and message.author.guild_permissions.administrator
         ):
-            if message.content.split(" ")[1] == "activate":
+            args = message.content.split(" ")
+            command = args[1]
+            if command == "activate" and message.author.guild_permissions.administrator:
                 await self._activate_bot(message)
 
-            elif message.content.split(" ")[1] == "deactivate":
+            elif (
+                command == "deactivate"
+                and message.author.guild_permissions.administrator
+            ):
                 await self._deactivate_bot(message)
 
             elif (
-                message.content.split(" ")[1] == "exhaust"
-                and len(message.content.split(" ")) == 3
+                command == "exhaust"
+                and len(args) == 3
+                and len(args[2]) == 1
+                and message.author.guild_permissions.administrator
             ):
                 await self._exhaust_words_beginning_with(message)
+
+            elif command == "score":
+                await self._construct_and_send_leader_board(message)
 
         else:
 
@@ -87,7 +96,7 @@ class WordChainClient(commands.Bot):
         )
 
     async def _exhaust_words_beginning_with(self, message: discord.Message):
-        old_letter = message.content.split(" ")[2]
+        old_letter = message.content.split(" ")[2].lower()
         self.db.curr.execute(
             f"UPDATE words_{message.guild.id} SET isUsed=1 WHERE word LIKE '{old_letter}%'"
         ).fetchone()
@@ -137,6 +146,28 @@ class WordChainClient(commands.Bot):
                 f"Server {message.guild.name} on boarded"
             )
 
+    async def _construct_and_send_leader_board(self, message: discord.Message):
+        result, data = client.db.leaderboard(message.guild.id)
+        if not result:
+            await message.response.send_message(data)
+            return
+
+        embed = discord.Embed()
+        embed.title = f"{message.guild.name} leaderboard"
+        embed.colour = discord.Color.purple()
+
+        for user_row in data:
+            rank, id, score = user_row
+            user = await client.fetch_user(id)
+            if not embed.thumbnail.url:
+                embed.set_thumbnail(url=user.avatar.url)
+            embed.add_field(
+                name=f"Rank {rank}.    @{user.global_name}    {score} points", value=""
+            )
+
+        embed.footer.text = f"WordChainAdmin made this"
+        await message.reply(embed=embed)
+
     def _validate_message(self, content: str):
         words = content.lower().split(" ")
         if len(words) > 1:
@@ -159,22 +190,6 @@ async def myscore(ctx: discord.Interaction):
         return
     id, score, rank = data
     message = f"```\n{rank}. {ctx.user.display_name} {score}\n```"
-    await ctx.response.send_message(message)
-
-
-@client.tree.command(name="score")
-async def score(ctx: discord.Interaction):
-    result, data = client.db.leaderboard(ctx.guild.id)
-    if not result:
-        await ctx.response.send_message(data)
-        return
-
-    message = "```\n"
-    for user_row in data:
-        rank, id, score = user_row
-        user = await client.fetch_user(id)
-        message += f"{rank}. {user.display_name} {score}\n"
-    message += "```"
     await ctx.response.send_message(message)
 
 
