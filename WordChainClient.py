@@ -3,7 +3,6 @@ import os
 
 import discord
 import requests
-from discord import app_commands
 from discord.ext import commands
 
 from MultiServerWordChainDB import MultiServerWordChainDB
@@ -24,10 +23,7 @@ class WordChainClient(commands.Bot):
         f.close()
 
     async def on_ready(self):
-        try:
-            await self.tree.sync()
-        except:
-            pass
+        await self.tree.sync()
 
     async def on_message(self, message: discord.message.Message):
 
@@ -61,6 +57,15 @@ class WordChainClient(commands.Bot):
 
             elif command == "score":
                 await self._construct_and_send_leader_board(message)
+
+            elif command == "myscore":
+                await self._send_user_score(message)
+
+            elif command == "help":
+                await self._send_help(message)
+
+            elif command == "meaning" and len(args) == 3:
+                await self._send_meaning(message)
 
         else:
 
@@ -147,7 +152,7 @@ class WordChainClient(commands.Bot):
             )
 
     async def _construct_and_send_leader_board(self, message: discord.Message):
-        result, data = client.db.leaderboard(message.guild.id)
+        result, data = self.db.leaderboard(message.guild.id)
         if not result:
             await message.response.send_message(data)
             return
@@ -158,7 +163,7 @@ class WordChainClient(commands.Bot):
 
         for user_row in data:
             rank, id, score = user_row
-            user = await client.fetch_user(id)
+            user = await self.fetch_user(id)
             if not embed.thumbnail.url:
                 embed.set_thumbnail(url=user.avatar.url)
             embed.add_field(
@@ -170,6 +175,56 @@ class WordChainClient(commands.Bot):
         embed.footer.text = f"WordChainAdmin made this"
         await message.reply(embed=embed)
 
+    async def _send_user_score(self, message: discord.Message):
+        result, data = self.db.get_score(message.guild.id, message.author.id)
+        if not result:
+            await message.response.send_message(data)
+            return
+        id, score, rank = data
+        message_ = f"```\n{rank}. {message.author.display_name} {score}\n```"
+        await message.reply(message_)
+
+    async def _send_meaning(self, message: discord.Message):
+        word = message.content.split(" ")[2]
+        if word.isalpha():
+            response = requests.get(
+                f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+            )
+            if response.status_code == 400:
+                await message.reply(
+                    f"Sorry pal! No meaning found for **{word}**. Dictionary api down"
+                )
+            try:
+                meaning = response.json()[0]["meanings"][0]["definitions"][0][
+                    "definition"
+                ]
+                await message.reply(f"`{word}: {meaning}`")
+            except:
+                await message.reply(
+                    f"Sorry pal! No meaning found for **{word}**. It could be a proper noun."
+                )
+            return
+        await message.reply("Invalid word")
+
+    async def _send_help(self, message: discord.Message):
+        await message.reply(
+            "Wordchain Rules\n"
+            "**1**. Check the previous accepted word.\n"
+            "**2**. Using the last letter of that write a new word.\n"
+            "**3**. NO CONSECUTIVE TURNS ALLOWED.\n"
+            "**4**. 7 or more characters in the word = 6 points.\n"
+            "**5**. 6 or lesser characters in the word = 4 points.\n"
+            "**6**. Same starting and ending letter = Additional 2 points.\n"
+            "**7**. Out of turn, wrong word in the chain = **2 points will be deducted**.\n"
+            "**8**. Word length has to be greater than 3.\n"
+            "Commands\n"
+            "```\n"
+            "@WordChainAdmin myscore\n"
+            "@WordChainAdmin score\n"
+            "@WordChainAdmin meaning <word>\n"
+            "```\n"
+        )
+
     def _validate_message(self, content: str):
         words = content.lower().split(" ")
         if len(words) > 1:
@@ -178,61 +233,9 @@ class WordChainClient(commands.Bot):
         return word.isalpha()
 
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.message_content = True
-client = WordChainClient(intents=intents, command_prefix="/")
-
-
-@client.tree.command(name="myscore")
-async def myscore(ctx: discord.Interaction):
-    result, data = client.db.get_score(ctx.guild.id, ctx.user.id)
-    if not result:
-        await ctx.response.send_message(data)
-        return
-    id, score, rank = data
-    message = f"```\n{rank}. {ctx.user.display_name} {score}\n```"
-    await ctx.response.send_message(message)
-
-
-@client.tree.command(name="meaning")
-@app_commands.describe(word="Find the meaning of this word")
-async def meaning(ctx: discord.Interaction, word: str):
-    if word.isalpha():
-        response = requests.get(
-            f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
-        )
-        if response.status_code == 400:
-            await ctx.response.send_message("Meaning of this word not found")
-        try:
-            meaning = response.json()[0]["meanings"][0]["definitions"][0]["definition"]
-            await ctx.response.send_message(f"`{word}: {meaning}`")
-        except:
-            await ctx.response.send_message(
-                f"Sorry pal! No meaning found for **{word}**. It could be a proper noun."
-            )
-        return
-    await ctx.response.send_message("Invalid word")
-
-
-@client.tree.command(name="help")
-async def help(ctx: discord.Interaction):
-    await ctx.response.send_message(
-        """
-Wordchain Rules
-**1**. Check the previous accepted word.
-**2**. Using the last letter of that write a new word.
-**3**. NO CONSECUTIVE TURNS ALLOWED.
-**4**. 7 or more characters in the word = 6 points.
-**5**. 6 or lesser characters in the word = 4 points.
-**6**. Same starting and ending letter = Additional 2 points.
-**7**. Out of turn, wrong word in the chain = **2 points will be deducted**.
-**8**. Word length has to be greater than 3.
-Commands
-```
-/myscore
-/score
-/meaning <word>
-```
-"""
-    )
+def construct_client():
+    intents = discord.Intents.default()
+    intents.messages = True
+    intents.message_content = True
+    client = WordChainClient(intents=intents, command_prefix="/")
+    return client

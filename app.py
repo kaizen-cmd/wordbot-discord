@@ -1,7 +1,7 @@
 import logging
 import os
 
-from WordChainClient import client
+from WordChainClient import construct_client
 from dotenv import load_dotenv
 
 if ".env" not in os.listdir():
@@ -21,7 +21,7 @@ logger = logging.getLogger("app")
 class App:
 
     TOKEN = ""
-    CLIENT = client
+    CLIENT = construct_client()
 
     def __init__(self, token) -> None:
         App.TOKEN = token
