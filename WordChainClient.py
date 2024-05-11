@@ -167,12 +167,12 @@ class WordChainClient(commands.Bot):
             if not embed.thumbnail.url:
                 embed.set_thumbnail(url=user.avatar.url)
             embed.add_field(
-                name=f"Rank {rank}.    @{user.global_name}    {score} points",
-                value="",
+                value=f"#{rank}.    @{user.global_name}    {score} points",
+                name="",
                 inline=False,
             )
 
-        embed.footer.text = f"WordChainAdmin made this"
+        embed.set_footer(text=f"WordChainAdmin made this")
         await message.reply(embed=embed)
 
     async def _send_user_score(self, message: discord.Message):
@@ -181,8 +181,16 @@ class WordChainClient(commands.Bot):
             await message.response.send_message(data)
             return
         id, score, rank = data
-        message_ = f"```\n{rank}. {message.author.display_name} {score}\n```"
-        await message.reply(message_)
+        embed = discord.Embed(title=f"{message.author.global_name}'s score")
+        embed.add_field(
+            value=f"Rank {rank}.    @{message.author.global_name}    {score} points",
+            name="",
+            inline=False,
+        )
+        embed.set_thumbnail(url=message.author.avatar.url)
+        embed.set_footer(text=f"WordChainAdmin made this")
+        embed.colour = discord.Color.dark_teal()
+        await message.reply(embed=embed)
 
     async def _send_meaning(self, message: discord.Message):
         word = message.content.split(" ")[2]
@@ -198,7 +206,11 @@ class WordChainClient(commands.Bot):
                 meaning = response.json()[0]["meanings"][0]["definitions"][0][
                     "definition"
                 ]
-                await message.reply(f"`{word}: {meaning}`")
+                embed = discord.Embed(title=f"Meaning of the word {word}")
+                embed.add_field(name=word, value=meaning)
+                embed.colour = discord.Color.dark_blue()
+                embed.set_footer(text=f"WordChainAdmin made this")
+                await message.reply(embed=embed)
             except:
                 await message.reply(
                     f"Sorry pal! No meaning found for **{word}**. It could be a proper noun."
@@ -223,6 +235,7 @@ class WordChainClient(commands.Bot):
             "@WordChainAdmin score\n"
             "@WordChainAdmin meaning <word>\n"
             "```\n"
+            "Support server: https://discord.gg/ftZJcGvsvP"
         )
 
     def _validate_message(self, content: str):
