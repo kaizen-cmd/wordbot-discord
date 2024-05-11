@@ -162,7 +162,9 @@ class WordChainClient(commands.Bot):
             if not embed.thumbnail.url:
                 embed.set_thumbnail(url=user.avatar.url)
             embed.add_field(
-                name=f"Rank {rank}.    @{user.global_name}    {score} points", value=""
+                name=f"Rank {rank}.    @{user.global_name}    {score} points",
+                value="",
+                inline=False,
             )
 
         embed.footer.text = f"WordChainAdmin made this"
