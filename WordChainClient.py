@@ -141,7 +141,7 @@ class WordChainClient(commands.Bot):
         if not self.db.is_server_onboard(server.id):
             self.db.onboard_server(server.id)
         await message.channel.send(
-            "Wordchain activated, type a word ✅ , ```/help for rules```"
+            "Wordchain activated, type a word ✅ , ```@WordChainAdmin help``` for rules and support"
         )
         if (
             server.id != WordChainClient.SUPPORT_SERVER_ID
