@@ -23,6 +23,12 @@ class WordChainClient(commands.Bot):
         f.close()
 
     async def on_ready(self):
+        await self.change_presence(
+            status=discord.Status.do_not_disturb,
+            activity=discord.Game(
+                name=f"WordChain in {len(self.guilds)} servers",
+            ),
+        )
         await self.tree.sync()
 
     async def on_message(self, message: discord.message.Message):
