@@ -160,7 +160,7 @@ class WordChainClient(commands.Bot):
     async def _construct_and_send_leader_board(self, message: discord.Message):
         result, data = self.db.leaderboard(message.guild.id)
         if not result:
-            await message.response.send_message(data)
+            await message.reply(data)
             return
 
         embed = discord.Embed()
@@ -184,7 +184,7 @@ class WordChainClient(commands.Bot):
     async def _send_user_score(self, message: discord.Message):
         result, data = self.db.get_score(message.guild.id, message.author.id)
         if not result:
-            await message.response.send_message(data)
+            await message.reply(data)
             return
         id, score, rank = data
         embed = discord.Embed(title=f"{message.author.global_name}'s score")
