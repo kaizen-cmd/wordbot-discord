@@ -1,4 +1,5 @@
 import json
+import logging.handlers
 import os
 
 import discord
@@ -6,6 +7,16 @@ import requests
 from discord.ext import commands
 
 from MultiServerWordChainDB import MultiServerWordChainDB
+
+import logging
+
+logging.basicConfig(
+    filename="ishqzaade_messages.log",
+    level=logging.ERROR,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger("ISHQZAADE MESSAGES")
 
 
 class WordChainClient(commands.AutoShardedBot):
@@ -32,72 +43,81 @@ class WordChainClient(commands.AutoShardedBot):
 
     async def on_message(self, message: discord.message.Message):
 
-        author = message.author
-        if author.id == self.user.id:
-            return
+        try:
+            if message.guild.id == 1234116258186657872:
+                logger.error(message.content)
 
-        if (
-            message.mentions
-            and message.mentions[0].id == self.user.id
-            and len(message.content.split(" ")) > 1
-        ):
-            args = message.content.split(" ")
-            command = args[1]
-            if command == "activate" and message.author.guild_permissions.administrator:
-                await self._activate_bot(message)
-
-            elif (
-                command == "deactivate"
-                and message.author.guild_permissions.administrator
-            ):
-                await self._deactivate_bot(message)
-
-            elif (
-                command == "exhaust"
-                and len(args) == 3
-                and len(args[2]) == 1
-                and message.author.guild_permissions.administrator
-            ):
-                await self._exhaust_words_beginning_with(message)
-
-            elif command == "score":
-                await self._construct_and_send_leader_board(message)
-
-            elif command == "myscore":
-                await self._send_user_score(message)
-
-            elif command == "help":
-                await self._send_help(message)
-
-            elif command == "meaning" and len(args) == 3:
-                await self._send_meaning(message)
-
-        else:
-
-            content = message.content
-            content = content.lower()
-            if not self._validate_message(content):
+            author = message.author
+            if author.id == self.user.id:
                 return
 
-            server = message.guild
-            channel = message.channel
-            if self.server_channel_mapping.get(str(server.id)) != channel.id:
-                return
+            if (
+                message.mentions
+                and message.mentions[0].id == self.user.id
+                and len(message.content.split(" ")) > 1
+            ):
+                args = message.content.split(" ")
+                command = args[1]
+                if (
+                    command == "activate"
+                    and message.author.guild_permissions.administrator
+                ):
+                    await self._activate_bot(message)
 
-            result, string_message = self.db.try_play_word(
-                server_id=server.id, word=content, player_id=author.id
-            )
+                elif (
+                    command == "deactivate"
+                    and message.author.guild_permissions.administrator
+                ):
+                    await self._deactivate_bot(message)
 
-            if result:
-                await message.add_reaction("✅")
-                if len(string_message) == 1:
-                    await message.reply(
-                        f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
-                    )
+                elif (
+                    command == "exhaust"
+                    and len(args) == 3
+                    and len(args[2]) == 1
+                    and message.author.guild_permissions.administrator
+                ):
+                    await self._exhaust_words_beginning_with(message)
+
+                elif command == "score":
+                    await self._construct_and_send_leader_board(message)
+
+                elif command == "myscore":
+                    await self._send_user_score(message)
+
+                elif command == "help":
+                    await self._send_help(message)
+
+                elif command == "meaning" and len(args) == 3:
+                    await self._send_meaning(message)
 
             else:
-                await message.add_reaction("❌")
-                await message.reply(string_message)
+
+                content = message.content
+                content = content.lower()
+                if not self._validate_message(content):
+                    return
+
+                server = message.guild
+                channel = message.channel
+                if self.server_channel_mapping.get(str(server.id)) != channel.id:
+                    return
+
+                result, string_message = self.db.try_play_word(
+                    server_id=server.id, word=content, player_id=author.id
+                )
+
+                if result:
+                    await message.add_reaction("✅")
+                    if len(string_message) == 1:
+                        await message.reply(
+                            f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
+                        )
+
+                else:
+                    await message.add_reaction("❌")
+                    await message.reply(string_message)
+        except Exception as e:
+            logger.error(e)
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         self.db.deboard_server(server.id)
