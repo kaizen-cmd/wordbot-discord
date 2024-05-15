@@ -8,7 +8,7 @@ from discord.ext import commands
 from MultiServerWordChainDB import MultiServerWordChainDB
 
 
-class WordChainClient(commands.Bot):
+class WordChainClient(commands.AutoShardedBot):
 
     SLAV_USER_ID = int(os.getenv("SLAV_USER_ID"))
     SUPPORT_SERVER_ID = int(os.getenv("SUPPORT_SERVER_ID"))
@@ -29,7 +29,6 @@ class WordChainClient(commands.Bot):
                 name=f"WordChain in {len(self.guilds)} servers",
             ),
         )
-        await self.tree.sync()
 
     async def on_message(self, message: discord.message.Message):
 
