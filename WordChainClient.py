@@ -44,7 +44,7 @@ class WordChainClient(commands.AutoShardedBot):
     async def on_message(self, message: discord.message.Message):
 
         try:
-            if message.guild.id == 1234116258186657872:
+            if message.guild.id == 1007908356964491274:
                 logger.error(message.content)
 
             author = message.author
