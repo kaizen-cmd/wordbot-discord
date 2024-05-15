@@ -10,13 +10,7 @@ from MultiServerWordChainDB import MultiServerWordChainDB
 
 import logging
 
-logging.basicConfig(
-    filename="ishqzaade_messages.log",
-    level=logging.ERROR,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
-logger = logging.getLogger("ISHQZAADE MESSAGES")
+logger = logging.getLogger(__name__)
 
 
 class WordChainClient(commands.AutoShardedBot):
@@ -117,7 +111,9 @@ class WordChainClient(commands.AutoShardedBot):
                     await message.add_reaction("❌")
                     await message.reply(string_message)
         except Exception as e:
-            logger.error(e)
+            logger.error(
+                f"MESSAGE PROCESSING ERROR: {message.content} == {e} == {message.guild.name}"
+            )
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         self.db.deboard_server(server.id)
