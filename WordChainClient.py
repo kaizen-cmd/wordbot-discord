@@ -83,14 +83,14 @@ class WordChainClient(commands.AutoShardedBot):
 
             else:
 
-                content = message.content
-                content = content.lower()
-                if not self._validate_message(content):
-                    return
-
                 server = message.guild
                 channel = message.channel
                 if self.server_channel_mapping.get(str(server.id)) != channel.id:
+                    return
+
+                content = message.content
+                content = content.lower()
+                if not self._validate_message(content):
                     return
 
                 result, string_message = self.db.try_play_word(
