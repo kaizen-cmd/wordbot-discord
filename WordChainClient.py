@@ -98,14 +98,14 @@ class WordChainClient(commands.AutoShardedBot):
                 )
 
                 if result:
-                    await message.add_reaction("O")
+                    await message.add_reaction("✅")
                     if len(string_message) == 1:
                         await message.reply(
                             f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
                         )
 
                 else:
-                    await message.add_reaction("X")
+                    await message.add_reaction("❌")
                     await message.reply(string_message)
         except Exception as e:
             logger.error(
