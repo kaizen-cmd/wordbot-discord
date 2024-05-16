@@ -98,18 +98,18 @@ class WordChainClient(commands.AutoShardedBot):
                 )
 
                 if result:
-                    await message.add_reaction("✅")
+                    await message.add_reaction("O")
                     if len(string_message) == 1:
                         await message.reply(
                             f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
                         )
 
                 else:
-                    await message.add_reaction("❌")
+                    await message.add_reaction("X")
                     await message.reply(string_message)
         except Exception as e:
             logger.error(
-                f"MESSAGE PROCESSING ERROR: {message.content} == {e} == {message.guild.name}"
+                f"MESSAGE PROCESSING: {message.content} == {e} == {message.guild.name}"
             )
 
     async def on_guild_remove(self, server: discord.guild.Guild):
@@ -249,17 +249,17 @@ class WordChainClient(commands.AutoShardedBot):
             "**8**. Word length has to be greater than 3.\n\n"
             "**User Commands**\n"
             "```\n"
-            "@WordChainAdmin myscore\n"
-            "@WordChainAdmin score\n"
-            "@WordChainAdmin meaning <word>\n"
+            "@WordChainRefree myscore\n"
+            "@WordChainRefree score\n"
+            "@WordChainRefree meaning <word>\n"
             "```\n\n"
             "**Admin Commands**\n"
             "```\n"
-            "@WordChainAdmin activate\n"
-            "@WordChainAdmin deactivate\n"
-            "@WordChainAdmin exhaust <letter> - End words beginning with <letter>\n"
+            "@WordChainRefree activate\n"
+            "@WordChainRefree deactivate\n"
+            "@WordChainRefree exhaust <letter> - End words beginning with <letter>\n"
             "```\n"
-            "Support server: https://discord.gg/ftZJcGvsvP"
+            "Join support server for bugs, suggestions"
         )
 
     def _validate_message(self, content: str):
