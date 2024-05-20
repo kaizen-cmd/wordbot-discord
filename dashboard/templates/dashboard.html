@@ -1,0 +1,19 @@
+<h1>Dashboard</h1>
+<h2>Message sender</h2>
+<style>
+  textarea {
+    resize: none;
+  }
+</style>
+<form action="/dashboard" method="post">
+  <div>
+    <textarea name="message" rows="15" cols="35"></textarea>
+  </div>
+  <div>
+    <button type="submit">Submit</button>
+  </div>
+  <br />
+  {% for server in servers %}
+  <div>{{server}}</div>
+  {% endfor %}
+</form>
