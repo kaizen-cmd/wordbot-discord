@@ -55,4 +55,4 @@ def dashboard():
 
 
 app.secret_key = "some_super_secret_key"
-app.run(debug=True)
+app.run(debug=True, host="0.0.0.0", port=8081)
