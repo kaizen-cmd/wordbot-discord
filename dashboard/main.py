@@ -1,58 +1,75 @@
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template, session, redirect, url_for, flash
 import requests
 import os
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
 
-headers = {
-    "Authorization": f'Bot {os.getenv("BOT_TOKEN")}',
+DISCORD_API_URL = "https://discord.com/api/v9"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+HEADERS = {
+    "Authorization": f"Bot {BOT_TOKEN}",
     "Content-Type": "application/json",
 }
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    global headers
     if request.method == "GET":
         if session.get("username") == "slav":
             response = requests.get(
-                "https://discord.com/api/v9/users/@me/guilds", headers=headers
+                f"{DISCORD_API_URL}/users/@me/guilds", headers=HEADERS
             )
-            servers = response.json()
-            return render_template(
-                "dashboard.html", servers=[server["name"] for server in servers]
-            )
+            if response.status_code == 200:
+                servers = response.json()
+                return render_template("dashboard.html", servers=servers)
+            else:
+                flash("Failed to fetch server information.", "error")
+                return redirect(url_for("login"))
         else:
-            return render_template("login.html")
+            return redirect(url_for("login"))
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         if username == "slav" and password == "salvador12345":
             session["username"] = username
-            return render_template("dashboard.html")
-        return render_template("login.html")
+            return redirect(url_for("home"))
+        else:
+            flash("Invalid username or password.", "error")
+            return redirect(url_for("login"))
+
+
+@app.route("/login", methods=["GET"])
+def login():
+    return render_template("login.html")
 
 
 @app.route("/dashboard", methods=["POST"])
 def dashboard():
-    if request.method == "POST" and session.get("username") == "slav":
+    if session.get("username") == "slav":
         server_id = 1240898515555844127
         channel_id = 1240898515555844130
         message = request.form.get("message")
         data = {"content": message}
         response = requests.post(
-            f"https://discord.com/api/v9/channels/{channel_id}/messages",
-            headers=headers,
+            f"{DISCORD_API_URL}/channels/{channel_id}/messages",
+            headers=HEADERS,
             json=data,
         )
         if response.status_code == 200:
-            print(f"Message sent to channel {channel_id} in guild {server_id}")
-        else:
-            print(
-                f"Failed to send message to channel {channel_id} in guild {server_id}. Status code: {response.status_code}"
+            flash(
+                f"Message sent to channel {channel_id} in guild {server_id}.", "success"
             )
-        return render_template("dashboard.html", context={"message": message})
+        else:
+            flash(
+                f"Failed to send message. Status code: {response.status_code}", "error"
+            )
+        return redirect(url_for("home"))
+    else:
+        flash("Unauthorized access.", "error")
+        return redirect(url_for("login"))
 
 
-app.secret_key = "some_super_secret_key"
-app.run(debug=True, host="0.0.0.0", port=8081)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=8081)
