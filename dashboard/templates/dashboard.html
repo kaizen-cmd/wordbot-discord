@@ -44,18 +44,11 @@
       button:hover {
         background-color: #45a049;
       }
-      .search-container {
-        margin-bottom: 15px;
-      }
     </style>
   </head>
   <body>
     <h1>Dashboard</h1>
     <h2>Message sender</h2>
-    <div class="search-container">
-      <input type="text" id="serverSearch" placeholder="Search by server name" />
-      <input type="text" id="memberCountSearch" placeholder="Search by member count" />
-    </div>
     <form action="/dashboard" method="post">
       <div>
         <textarea name="message" rows="15" cols="35"></textarea>
@@ -64,33 +57,38 @@
         <button type="submit">Submit</button>
       </div>
       <br />
-      <table id="serversTable">
-        <thead>
-          <tr>
-            <th>Server Name</th>
-            <th>Member Count</th>
-            <th>Message box</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for server in servers %}
-          <tr>
-            <td>{{ server.name }}</td>
-            <td>{{ server.member_count }}</td>
-            <td>
-              <input type="text" name="message-{{ server.id }}" placeholder="Type your message here" />
-            </td>
-            <td>
-              <button type="button">Send</button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </form>
+    <table id="serversTable">
+      <thead>
+        <tr>
+          <th>
+            Server Name
+            <input type="text" id="serverSearch" placeholder="Search by server name" />
+          </th>
+          <th>
+            Member Count
+            <input type="text" id="memberCountSearch" placeholder="Search by member count" />
+          </th>
+          <th>Message box</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for server in servers %}
+        <tr>
+          <td>{{ server.name }}</td>
+          <td>{{ server.member_count }}</td>
+          <td>
+            <input type="text" name="message-{{ server.id }}" placeholder="Type your message here" />
+          </td>
+          <td>
+            <button type="button">Send</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
     <script>
-      // Function to filter table based on search inputs
       function filterTable() {
         const serverSearch = document.getElementById("serverSearch").value.toLowerCase();
         const memberCountSearch = document.getElementById("memberCountSearch").value.toLowerCase();

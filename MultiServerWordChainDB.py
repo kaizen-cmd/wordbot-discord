@@ -135,7 +135,7 @@ class MultiServerWordChainDB:
             self.conn.commit()
             return (
                 False,
-                f"Word's first character does not match the last character that is `{last_char}`. **{self.negative_marks} points deducted**",
+                f"Write a word starting with {last_char}. **{self.negative_marks} points deducted**",
             )
 
         word_result = self.curr.execute(

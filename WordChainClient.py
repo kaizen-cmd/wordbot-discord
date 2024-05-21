@@ -140,7 +140,7 @@ class WordChainClient(commands.AutoShardedBot):
         except Exception as e:
             pass
         await message.channel.send(
-            "Wordchain resetted and deactivated  ⭕️, `@WordChainAdmin activate` to reactivate"
+            "Wordchain resetted and deactivated  ⭕️, `@GamingRefree activate` to reactivate"
         )
         if (
             message.guild.id != WordChainClient.SUPPORT_SERVER_ID
@@ -159,7 +159,7 @@ class WordChainClient(commands.AutoShardedBot):
         if not self.db.is_server_onboard(server.id):
             self.db.onboard_server(server.id)
         await message.channel.send(
-            "Wordchain activated, type a word ✅ , ```@WordChainAdmin help``` for rules and support"
+            "Wordchain activated, type a word ✅ , ```@GamingRefree help``` for rules and support"
         )
         if (
             server.id != WordChainClient.SUPPORT_SERVER_ID
@@ -190,7 +190,7 @@ class WordChainClient(commands.AutoShardedBot):
                 inline=False,
             )
 
-        embed.set_footer(text=f"WordChainAdmin made this")
+        embed.set_footer(text=f"GamingRefree made this")
         await message.reply(embed=embed)
 
     async def _send_user_score(self, message: discord.Message):
@@ -206,7 +206,7 @@ class WordChainClient(commands.AutoShardedBot):
             inline=False,
         )
         embed.set_thumbnail(url=message.author.avatar.url)
-        embed.set_footer(text=f"WordChainAdmin made this")
+        embed.set_footer(text=f"GamingRefree made this")
         embed.colour = discord.Color.dark_teal()
         await message.reply(embed=embed)
 
@@ -227,7 +227,7 @@ class WordChainClient(commands.AutoShardedBot):
                 embed = discord.Embed(title=f"Meaning of the word {word}")
                 embed.add_field(name=word, value=meaning)
                 embed.colour = discord.Color.dark_blue()
-                embed.set_footer(text=f"WordChainAdmin made this")
+                embed.set_footer(text=f"GamingRefree made this")
                 await message.reply(embed=embed)
             except:
                 await message.reply(
