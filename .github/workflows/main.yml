@@ -33,5 +33,5 @@ jobs:
             cd /home/ubuntu/wordbot-discord
             source venv/bin/activate
             git pull origin main
-            pip install -r web/requirements.txt
+            pip install -r requirements.txt
             sudo systemctl restart wordchain.service
