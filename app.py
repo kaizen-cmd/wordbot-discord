@@ -56,7 +56,7 @@ class App:
                             logger.error(
                                 f"Error in getting leaderboard for {server_id}"
                             )
-                    ranks.sort(key=lambda x: x[1])
+                    ranks.sort(key=lambda x: x[1], reverse=True)
 
                     with open("global_ranks.txt", "w") as f2:
                         f2.write(datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
