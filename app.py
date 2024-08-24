@@ -46,11 +46,16 @@ class App:
                 ):
                     ranks = list()
                     for server_id in list(App.CLIENT.server_channel_mapping.keys()):
-                        exists, result = App.CLIENT.db.leaderboard(server_id)
-                        if exists:
-                            for rec in result:
-                                server_rank, id, score = rec
-                                ranks.append((id, score))
+                        try:
+                            exists, result = App.CLIENT.db.leaderboard(server_id)
+                            if exists:
+                                for rec in result:
+                                    server_rank, id, score = rec
+                                    ranks.append((id, score))
+                        except:
+                            logger.error(
+                                f"Error in getting leaderboard for {server_id}"
+                            )
                     ranks.sort(key=lambda x: x[1])
 
                     with open("global_ranks.txt", "w") as f2:
