@@ -34,6 +34,7 @@ class WordChainClient(commands.AutoShardedBot):
                 name=f"WordChain in {len(self.guilds)} servers",
             ),
         )
+        # await self.tree.sync()
 
     async def on_message(self, message: discord.message.Message):
 
@@ -116,6 +117,20 @@ class WordChainClient(commands.AutoShardedBot):
         self.db.deboard_server(server.id)
         await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
             f"Server {server.name} kicked the bot"
+        )
+        await self.change_presence(
+            status=discord.Status.do_not_disturb,
+            activity=discord.Game(
+                name=f"WordChain in {len(self.guilds)} servers",
+            ),
+        )
+
+    async def on_guild_join(self, server: discord.Guild):
+        await self.change_presence(
+            status=discord.Status.do_not_disturb,
+            activity=discord.Game(
+                name=f"WordChain in {len(self.guilds)} servers",
+            ),
         )
 
     async def _exhaust_words_beginning_with(self, message: discord.Message):
