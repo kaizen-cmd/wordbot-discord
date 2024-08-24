@@ -34,7 +34,7 @@ class WordChainClient(commands.AutoShardedBot):
                 name=f"WordChain in {len(self.guilds)} servers",
             ),
         )
-        # await self.tree.sync()
+        await self.tree.sync()
 
     async def on_message(self, message: discord.message.Message):
 
