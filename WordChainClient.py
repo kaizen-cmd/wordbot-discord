@@ -197,8 +197,13 @@ class WordChainClient(commands.AutoShardedBot):
         for user_row in data:
             rank, id, score = user_row
             user = await self.fetch_user(id)
-            if not embed.thumbnail.url:
-                embed.set_thumbnail(url=user.avatar.url)
+            try:
+                if not embed.thumbnail.url:
+                    embed.set_thumbnail(url=user.avatar.url)
+            except:
+                logger.error(
+                    f"Error in setting leaderboard thumbnail for user {user.global_name}"
+                )
             embed.add_field(
                 value=f"#{rank}.    @{user.global_name}    {score} points",
                 name="",
