@@ -36,5 +36,8 @@ jobs:
             source venv/bin/activate
             git pull origin main
             pip install -r requirements.txt
+            sudo systemctl daemon-reload
+            sudo systemctl enable wordchain.service
+            sudo systemctl enable web.service
             sudo systemctl restart wordchain.service
             sudo systemctl restart web.service
