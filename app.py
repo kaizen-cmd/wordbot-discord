@@ -84,6 +84,15 @@ class App:
                     rank += 1
             await interaction.response.send_message(embed=embed)
 
+        @App.CLIENT.tree.command(
+            name="vote",
+            description="vote on top.gg to get double points for next 5 words",
+        )
+        async def send_vote_link(interaction: discord.Interaction):
+            await interaction.response.send_message(
+                "Vote on https://top.gg/bot/1225490759432798320 to get double points on next 5 accepted words"
+            )
+
     def run(self):
         App.CLIENT.run(App.TOKEN)
 

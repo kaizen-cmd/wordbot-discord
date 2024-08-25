@@ -31,7 +31,10 @@ jobs:
           script: |
             sudo apt-get install libpq-dev python3-dev -y
             cd /home/ubuntu/wordbot-discord
+            cp wordchain.service /etc/systemd/system/wordchain.service
+            cp web.service /etc/systemd/system/web.service
             source venv/bin/activate
             git pull origin main
             pip install -r requirements.txt
             sudo systemctl restart wordchain.service
+            sudo systemctl restart web.service

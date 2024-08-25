@@ -2,6 +2,7 @@ import logging
 import sqlite3
 from collections import defaultdict
 import random
+from collections import namedtuple
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,8 @@ class MultiServerWordChainDB:
             table_name = table_name[0]  # Extract table name from tuple
             server_id = "_".join(table_name.split("_")[0:-1])
             self.server_table_mapping[server_id].append(table_name)
+
+        self._create_voting_record_table()
 
     def __del__(self):
         self.curr.close()
@@ -150,13 +153,27 @@ class MultiServerWordChainDB:
         if is_word_used:
             return (False, "Word already used")
 
+        voting_record = self.curr.execute(
+            f"SELECT word_count FROM voting_records WHERE user_id='{player_id}'"
+        ).fetchone()
+        points_obtained = 0
         if len(word) > 7:
             user_score += self.marks_for_word_length_gte_seven
+            points_obtained += self.marks_for_word_length_gte_seven
         else:
             user_score += self.marks_for_word_length_lte_seven
+            points_obtained += self.marks_for_word_length_lte_seven
 
         if word[0] == word[-1]:
             user_score += self.marks_for_same_start_end_word
+            points_obtained += self.marks_for_same_start_end_word
+
+        if voting_record and voting_record[0] > 0 and points_obtained > 0:
+            user_score += points_obtained
+            self.curr.execute(
+                f"UPDATE voting_records SET word_count={voting_record[0] - 1} WHERE user_id='{player_id}'"
+            )
+            self.conn.commit()
 
         self.curr.execute(
             f"UPDATE {user_table} SET score=? WHERE id=?", (user_score, player_id)
@@ -198,6 +215,28 @@ class MultiServerWordChainDB:
             result.append((rank, id, score))
         return (True, result)
 
+    def create_or_update_voting_record(self, user_id: str, word_count: int):
+        voting_record = self.curr.execute(
+            f"SELECT user_id, word_count FROM voting_records WHERE user_id='{user_id}'"
+        ).fetchone()
+        if not voting_record:
+            self.curr.execute(
+                f"INSERT INTO voting_records VALUES('{user_id}', {word_count})"
+            )
+            voting_record = self.curr.execute(
+                f"SELECT word_count FROM voting_records WHERE user_id='{user_id}'"
+            ).fetchone()
+        else:
+            self.curr.execute(
+                f"UPDATE voting_records SET word_count={voting_record[1] + word_count} WHERE user_id='{user_id}'"
+            )
+            voting_record = self.curr.execute(
+                f"SELECT word_count FROM voting_records WHERE user_id='{user_id}'"
+            ).fetchone()
+        self.conn.commit()
+        VotingRecord = namedtuple("voting_record", ["user_id", "word_count"])
+        return VotingRecord(voting_record[0], voting_record[1])
+
     def _change_letter(self, server_id):
 
         word_table = self.get_words_table_name(server_id)
@@ -215,3 +254,8 @@ class MultiServerWordChainDB:
                 )
                 self.conn.commit()
                 return i
+
+    def _create_voting_record_table(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS voting_records(user_id VARCHAR(255), word_count INTEGER)"
+        )
