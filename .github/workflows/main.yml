@@ -41,3 +41,4 @@ jobs:
             sudo systemctl enable web.service
             sudo systemctl restart wordchain.service
             sudo systemctl restart web.service
+            sudo systemctl restart nginx.service

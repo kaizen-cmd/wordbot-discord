@@ -1,6 +1,5 @@
 import os
-from flask import Flask, request
-from app import App
+from flask import Flask, request, render_template_string
 from scripts.send_dm import create_dm_channel, send_dm
 import logging
 import sqlite3
@@ -71,6 +70,161 @@ def vote_callback():
     )
 
     return "Success"
+
+
+@app.route("/", methods=["GET"])
+def home():
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wordchain Bot - GamingRefree</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #1e1e2f;
+                color: #f0f0f0;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+            .container {
+                background-color: #2e2e3e;
+                border-radius: 12px;
+                padding: 40px;
+                max-width: 800px;
+                text-align: center;
+                box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+            }
+            h1 {
+                color: #ff9900;
+                font-size: 48px;
+                margin-bottom: 20px;
+            }
+            p {
+                line-height: 1.6;
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            .rules, .commands {
+                background-color: #3e3e4f;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+            .commands {
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+            }
+            .command-section {
+                margin-bottom: 20px;
+            }
+            .command-section h3 {
+                color: #ffcc00;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+            code {
+                background-color: #1e1e2f;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 16px;
+                display: block;
+                color: #ffcc00;
+            }
+            .buttons {
+                margin-top: 30px;
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+            }
+            .btn {
+                padding: 15px 30px;
+                font-size: 18px;
+                font-weight: bold;
+                border-radius: 8px;
+                border: none;
+                cursor: pointer;
+                text-transform: uppercase;
+                transition: background-color 0.3s;
+            }
+            .btn-invite {
+                background-color: #ff5722;
+                color: white;
+            }
+            .btn-invite:hover {
+                background-color: #e64a19;
+            }
+            .btn-support {
+                background-color: #007bff;
+                color: white;
+            }
+            .btn-support:hover {
+                background-color: #0056b3;
+            }
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>GamingRefree Wordchain Bot</h1>
+            <p>Welcome to the official homepage of the Wordchain Discord Bot, where every word counts!</p>
+            <div class="rules">
+                <h2>Wordchain Rules</h2>
+                <p>1. Check the previous accepted word.</p>
+                <p>2. Using the last letter of that write a new word.</p>
+                <p>3. NO CONSECUTIVE TURNS ALLOWED.</p>
+                <p>4. 7 or more characters in the word = 6 points.</p>
+                <p>5. 6 or lesser characters in the word = 4 points.</p>
+                <p>6. Same starting and ending letter = Additional 2 points.</p>
+                <p>7. Out of turn, wrong word in the chain = 2 points will be deducted.</p>
+                <p>8. Word length has to be greater than 3.</p>
+            </div>
+            <div class="buttons">
+                <a href="https://top.gg/bot/1225490759432798320/vote" target="_blank">
+                    <button class="btn btn-support">Vote - Get 2x Points</button>
+                </a>
+                <a href="https://discord.com/oauth2/authorize?client_id=1225490759432798320&scope=bot" target="_blank">
+                    <button class="btn btn-invite">Invite Bot</button>
+                </a>
+                <a href="https://discord.gg/BAnFejS7bQ" target="_blank">
+                    <button class="btn btn-support">Join Support Server</button>
+                </a>
+            </div>
+            <br />
+            <div class="commands">
+                <div class="command-section">
+                    <h3>User Commands</h3>
+                    <code>@GamingRefree myscore</code>
+                    <code>@GamingRefree score</code>
+                    <code>@GamingRefree meaning &lt;word&gt;</code>
+                </div>
+                <div class="command-section">
+                    <h3>Slash Commands</h3>
+                    <code>/vote - Get double points for next 5 words</code>
+                    <code>/global_leaderboard - Get global rankings</code>
+                </div>
+                <div class="command-section">
+                    <h3>Admin Commands</h3>
+                    <code>@GamingRefree activate</code>
+                    <code>@GamingRefree deactivate</code>
+                    <code>@GamingRefree exhaust &lt;letter&gt;</code>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return render_template_string(html_content)
 
 
 if __name__ == "__main__":
