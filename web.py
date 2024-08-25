@@ -91,7 +91,6 @@ def home():
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                height: 100vh;
             }
             .container {
                 background-color: #2e2e3e;
@@ -178,16 +177,8 @@ def home():
         <div class="container">
             <h1>GamingRefree Wordchain Bot</h1>
             <p>Welcome to the official homepage of the Wordchain Discord Bot, where every word counts!</p>
-            <div class="rules">
-                <h2>Wordchain Rules</h2>
-                <p>1. Check the previous accepted word.</p>
-                <p>2. Using the last letter of that write a new word.</p>
-                <p>3. NO CONSECUTIVE TURNS ALLOWED.</p>
-                <p>4. 7 or more characters in the word = 6 points.</p>
-                <p>5. 6 or lesser characters in the word = 4 points.</p>
-                <p>6. Same starting and ending letter = Additional 2 points.</p>
-                <p>7. Out of turn, wrong word in the chain = 2 points will be deducted.</p>
-                <p>8. Word length has to be greater than 3.</p>
+            <div>
+                <img src="https://i.imgur.com/HLfacqZ.png" style="max-width: 100%" />
             </div>
             <div class="buttons">
                 <a href="https://top.gg/bot/1225490759432798320/vote" target="_blank">
@@ -201,6 +192,17 @@ def home():
                 </a>
             </div>
             <br />
+            <div class="rules">
+                <h2>Wordchain Rules</h2>
+                <p>1. Check the previous accepted word.</p>
+                <p>2. Using the last letter of that write a new word.</p>
+                <p>3. NO CONSECUTIVE TURNS ALLOWED.</p>
+                <p>4. 7 or more characters in the word = 6 points.</p>
+                <p>5. 6 or lesser characters in the word = 4 points.</p>
+                <p>6. Same starting and ending letter = Additional 2 points.</p>
+                <p>7. Out of turn, wrong word in the chain = 2 points will be deducted.</p>
+                <p>8. Word length has to be greater than 3.</p>
+            </div>
             <div class="commands">
                 <div class="command-section">
                     <h3>User Commands</h3>
