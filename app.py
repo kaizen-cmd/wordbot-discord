@@ -167,6 +167,7 @@ class App:
                 "/global_leaderboard - Get global rankings\n"
                 "```\n"
                 "**Admin Commands**\n"
+                "```\n"
                 "/activate - start the game in this channel\n"
                 "/deactivate - reset the scores to zero and deactivate\n"
                 "/exhaust <letter> - End words beginning with <letter>\n"
