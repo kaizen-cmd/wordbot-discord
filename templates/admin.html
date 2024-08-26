@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+  </head>
+  <body>
+    <!-- Broadcast Message Text Box -->
+    <div>
+      <h2>Broadcast Message to All Servers</h2>
+      <form action="/broadcast" method="POST">
+        <input type="text" name="broadcast_message" placeholder="Enter message" style="width: 300px" />
+        <button type="submit">Send Broadcast</button>
+      </form>
+    </div>
+
+    <!-- Server List Table -->
+    <h2>Servers</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Server Name</th>
+          <th>Server ID</th>
+          <th>Send Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for server in servers %}
+        <tr>
+          <td>{{ server.name }}</td>
+          <td>{{ server.id }}</td>
+          <td>
+            <form action="/send_message" method="POST">
+              <input type="hidden" name="server_id" value="{{ server.id }}" />
+              <input type="text" name="message" placeholder="Enter message" style="width: 200px" />
+              <button type="submit">Send</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
