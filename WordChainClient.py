@@ -50,34 +50,12 @@ class WordChainClient(commands.AutoShardedBot):
             ):
                 args = message.content.split(" ")
                 command = args[1]
-                if (
-                    command == "activate"
-                    and message.author.guild_permissions.administrator
-                ):
-                    await self._activate_bot(message)
 
-                elif (
-                    command == "deactivate"
-                    and message.author.guild_permissions.administrator
-                ):
-                    await self._deactivate_bot(message)
-
-                elif (
-                    command == "exhaust"
-                    and len(args) == 3
-                    and len(args[2]) == 1
-                    and message.author.guild_permissions.administrator
-                ):
-                    await self._exhaust_words_beginning_with(message)
-
-                elif command == "score":
+                if command == "score":
                     await self._construct_and_send_leader_board(message)
 
                 elif command == "myscore":
                     await self._send_user_score(message)
-
-                elif command == "help":
-                    await self._send_help(message)
 
                 elif command == "meaning" and len(args) == 3:
                     await self._send_meaning(message)
@@ -133,56 +111,34 @@ class WordChainClient(commands.AutoShardedBot):
             ),
         )
 
-    async def _exhaust_words_beginning_with(self, message: discord.Message):
-        old_letter = message.content.split(" ")[2].lower()
+    def _exhaust_words_beginning_with(self, old_letter, server_id):
         self.db.curr.execute(
-            f"UPDATE words_{message.guild.id} SET isUsed=1 WHERE word LIKE '{old_letter}%'"
+            f"UPDATE words_{server_id} SET isUsed=1 WHERE word LIKE '{old_letter}%'"
         ).fetchone()
         self.db.conn.commit()
-        new_letter = self.db._change_letter(server_id=message.guild.id)
-        await message.reply(
-            f"Words starting with `{old_letter}` exhausted. A new letter will be suggested whenever a word ends in this letter. New letter is `{new_letter}`"
-        )
+        new_letter = self.db._change_letter(server_id=server_id)
+        return new_letter
 
-    async def _deactivate_bot(self, message: discord.Message):
-        if self.server_channel_mapping.get(str(message.guild.id)):
-            del self.server_channel_mapping[str(message.guild.id)]
+    def _deactivate_bot(self, server: discord.Guild, channel):
+        if self.server_channel_mapping.get(str(server.id)):
+            del self.server_channel_mapping[str(server.id)]
             f = open("server_channel_mapping.json", "w")
             f.write(json.dumps(self.server_channel_mapping))
             f.close()
         try:
-            self.db.deboard_server(server_id=message.guild.id)
+            self.db.deboard_server(server_id=server.id)
         except Exception as e:
             pass
-        await message.channel.send(
-            "Wordchain resetted and deactivated  ⭕️, `@GamingRefree activate` to reactivate"
-        )
-        if (
-            message.guild.id != WordChainClient.SUPPORT_SERVER_ID
-            or self.user.name == "word-chain-test"
-        ):
-            await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
-                f"Server {message.guild.name} de-activated"
-            )
+        return "Wordchain resetted and deactivated  ⭕️, `/activate` to reactivate"
 
-    async def _activate_bot(self, message: discord.Message):
-        self.server_channel_mapping[str(message.guild.id)] = message.channel.id
+    def _activate_bot(self, server: discord.Guild, channel):
+        self.server_channel_mapping[str(server.id)] = channel.id
         f = open("server_channel_mapping.json", "w")
         f.write(json.dumps(self.server_channel_mapping))
         f.close()
-        server = message.guild
         if not self.db.is_server_onboard(server.id):
             self.db.onboard_server(server.id)
-        await message.channel.send(
-            "Wordchain activated, type a word ✅ , ```@GamingRefree help``` for rules and support"
-        )
-        if (
-            server.id != WordChainClient.SUPPORT_SERVER_ID
-            or self.user.name == "word-chain-test"
-        ):
-            await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
-                f"Server {message.guild.name} on boarded"
-            )
+        return "Wordchain activated, type a word ✅ , ```/help``` for rules and support"
 
     async def _construct_and_send_leader_board(self, message: discord.Message):
         result, data = self.db.leaderboard(message.guild.id)
