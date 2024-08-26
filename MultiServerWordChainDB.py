@@ -198,7 +198,7 @@ class MultiServerWordChainDB:
         QUERY = f"SELECT id, score, (SELECT COUNT(DISTINCT score) + 1 FROM {user_table} WHERE score > u.score) AS rank FROM {user_table} u WHERE id = {player_id}"
         result = self.curr.execute(QUERY).fetchone()
         if not result:
-            return (False, "Start playing")
+            return (False, "Ask them to start playing")
         id, score, rank = result
         return (True, (id, score, rank))
 

@@ -156,15 +156,12 @@ class App:
                 "**8**. Word length has to be greater than 3.\n\n"
                 "**User Commands**\n"
                 "```\n"
-                "@GamingRefree myscore\n"
-                "@GamingRefree score\n"
-                "@GamingRefree meaning <word>\n"
-                "```\n"
-                "**Slash Commands**\n"
-                "```\n"
                 "/help - Get help for wordchain bot\n"
-                "/vote - Get double points for next 5 words\n"
+                "/score <username> - Get score of the user\n"
+                "/server_leaderboard - Get server rankings\n"
                 "/global_leaderboard - Get global rankings\n"
+                "/meaning <word>\n"
+                "/vote - Get double points for next 5 words\n"
                 "```\n"
                 "**Admin Commands**\n"
                 "```\n"
@@ -186,6 +183,40 @@ class App:
             await interaction.response.send_message(
                 f"Words starting with `{letter}` exhausted. A new letter will be suggested whenever a word ends in this letter. New letter is `{new_letter}`"
             )
+
+        @self.CLIENT.tree.command(
+            name="score", description="get score of the mentioned user"
+        )
+        async def score(interaction: discord.Interaction, user: discord.User):
+            message = self.CLIENT._send_user_score(user, interaction.guild)
+            if type(message) == str:
+                await interaction.response.send_message(message)
+                return
+            await interaction.response.send_message(embed=message)
+
+        @self.CLIENT.tree.command(
+            name="server_leaderboard",
+            description="get leaderboard for the current server",
+        )
+        async def server_leaderboard(interaction: discord.Interaction):
+            message = await self.CLIENT._construct_and_send_leader_board(
+                interaction.guild
+            )
+            if type(message) == str:
+                await interaction.response.send_message(message)
+                return
+            await interaction.response.send_message(embed=message)
+
+        @self.CLIENT.tree.command(
+            name="meaning",
+            description="get meaning of the word",
+        )
+        async def meaning(interaction: discord.Interaction, word: str):
+            message = self.CLIENT._send_meaning(word)
+            if type(message) == str:
+                await interaction.response.send_message(message)
+                return
+            await interaction.response.send_message(embed=message)
 
     def run(self):
         self.CLIENT.run(App.TOKEN)

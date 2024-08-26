@@ -43,49 +43,30 @@ class WordChainClient(commands.AutoShardedBot):
             if author.id == self.user.id:
                 return
 
-            if (
-                message.mentions
-                and message.mentions[0].id == self.user.id
-                and len(message.content.split(" ")) > 1
-            ):
-                args = message.content.split(" ")
-                command = args[1]
+            server = message.guild
+            channel = message.channel
+            if self.server_channel_mapping.get(str(server.id)) != channel.id:
+                return
 
-                if command == "score":
-                    await self._construct_and_send_leader_board(message)
+            content = message.content
+            content = content.lower()
+            if not self._validate_message(content):
+                return
 
-                elif command == "myscore":
-                    await self._send_user_score(message)
+            result, string_message = self.db.try_play_word(
+                server_id=server.id, word=content, player_id=author.id
+            )
 
-                elif command == "meaning" and len(args) == 3:
-                    await self._send_meaning(message)
+            if result:
+                await message.add_reaction("✅")
+                if len(string_message) == 1:
+                    await message.reply(
+                        f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
+                    )
 
             else:
-
-                server = message.guild
-                channel = message.channel
-                if self.server_channel_mapping.get(str(server.id)) != channel.id:
-                    return
-
-                content = message.content
-                content = content.lower()
-                if not self._validate_message(content):
-                    return
-
-                result, string_message = self.db.try_play_word(
-                    server_id=server.id, word=content, player_id=author.id
-                )
-
-                if result:
-                    await message.add_reaction("✅")
-                    if len(string_message) == 1:
-                        await message.reply(
-                            f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
-                        )
-
-                else:
-                    await message.add_reaction("❌")
-                    await message.reply(string_message)
+                await message.add_reaction("❌")
+                await message.reply(string_message)
         except Exception as e:
             logger.error(
                 f"MESSAGE PROCESSING: {message.content} == {e} == {message.guild.name}"
@@ -140,14 +121,13 @@ class WordChainClient(commands.AutoShardedBot):
             self.db.onboard_server(server.id)
         return "Wordchain activated, type a word ✅ , ```/help``` for rules and support"
 
-    async def _construct_and_send_leader_board(self, message: discord.Message):
-        result, data = self.db.leaderboard(message.guild.id)
+    async def _construct_and_send_leader_board(self, server: discord.Guild):
+        result, data = self.db.leaderboard(server.id)
         if not result:
-            await message.reply(data)
-            return
+            return data
 
         embed = discord.Embed()
-        embed.title = f"{message.guild.name} leaderboard"
+        embed.title = f"{server.name} leaderboard"
         embed.colour = discord.Color.purple()
 
         for user_row in data:
@@ -167,35 +147,32 @@ class WordChainClient(commands.AutoShardedBot):
             )
 
         embed.set_footer(text=f"GamingRefree made this")
-        await message.reply(embed=embed)
+        return embed
 
-    async def _send_user_score(self, message: discord.Message):
-        result, data = self.db.get_score(message.guild.id, message.author.id)
+    def _send_user_score(self, author: discord.User, server: discord.Guild):
+        result, data = self.db.get_score(server.id, author.id)
         if not result:
-            await message.reply(data)
-            return
+            return data
         id, score, rank = data
-        embed = discord.Embed(title=f"{message.author.global_name}'s score")
+        embed = discord.Embed(title=f"{author.global_name}'s score")
         embed.add_field(
-            value=f"Rank {rank}.    @{message.author.global_name}    {score} points",
+            value=f"Rank {rank}.    @{author.global_name}    {score} points",
             name="",
             inline=False,
         )
-        embed.set_thumbnail(url=message.author.avatar.url)
+        embed.set_thumbnail(url=author.avatar.url)
         embed.set_footer(text=f"GamingRefree made this")
         embed.colour = discord.Color.dark_teal()
-        await message.reply(embed=embed)
+        return embed
 
-    async def _send_meaning(self, message: discord.Message):
-        word = message.content.split(" ")[2]
+    def _send_meaning(self, word: str):
         if word.isalpha():
             response = requests.get(
                 f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
             )
             if response.status_code == 400:
-                await message.reply(
-                    f"Sorry pal! No meaning found for **{word}**. Dictionary api down"
-                )
+                return f"The language expert is not avaialable at the moment"
+
             try:
                 meaning = response.json()[0]["meanings"][0]["definitions"][0][
                     "definition"
@@ -204,13 +181,10 @@ class WordChainClient(commands.AutoShardedBot):
                 embed.add_field(name=word, value=meaning)
                 embed.colour = discord.Color.dark_blue()
                 embed.set_footer(text=f"GamingRefree made this")
-                await message.reply(embed=embed)
+                return embed
             except:
-                await message.reply(
-                    f"Sorry pal! No meaning found for **{word}**. It could be a proper noun."
-                )
-            return
-        await message.reply("Invalid word")
+                return f"The language expert is not avaialable at the moment"
+        return "Invalid word"
 
     async def _send_help(self, message: discord.Message):
         await message.reply(
