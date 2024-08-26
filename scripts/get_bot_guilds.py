@@ -10,7 +10,6 @@ def get_bot_guilds():
 
     if response.status_code == 200:
         guilds = response.json()
-        # Extract the server name and server ID
         return [{"name": guild["name"], "id": guild["id"]} for guild in guilds]
     else:
         print(f"Failed to fetch guilds: {response.status_code}, {response.text}")

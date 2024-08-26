@@ -6,6 +6,7 @@ from scripts.send_custom_message import send_to_server, broadcast
 import logging
 import sqlite3
 from collections import namedtuple
+import multiprocessing
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +103,15 @@ def send_message():
         return redirect("/admin")
     data = request.form
     send_to_server(data.get("message"), data.get("server_id"))
+    return redirect("/admin")
+
+
+@app.route("/broadcast", methods=["POST"])
+def broadcast_message():
+    if session.get("authenticated") != True:
+        return redirect("/admin")
+    data = request.form
+    broadcast(data.get("broadcast_message"))
     return redirect("/admin")
 
 

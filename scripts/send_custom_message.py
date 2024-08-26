@@ -8,6 +8,7 @@ import requests
 import os
 import json
 import argparse
+import logging
 
 f = open("./server_channel_mapping.json", "r")
 server_channel_mapping = json.loads(f.read())
@@ -38,6 +39,12 @@ def send_to_server(message="Hello World!", server_id="1234116258186657872"):
 
 
 def broadcast(message="Hello!"):
+    logging.basicConfig(
+        filename="broadcast.log",
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+    logger = logging.getLogger("broadcast_message_log")
     global server_channel_mapping
     global headers
     response = requests.get(
@@ -57,9 +64,11 @@ def broadcast(message="Hello!"):
             )
 
             if response.status_code == 200:
-                print(f"Message sent to channel {channel_id} in guild {server_id}")
+                logger.info(
+                    f"Message sent to channel {channel_id} in guild {server['name']}"
+                )
             else:
-                print(
+                logger.error(
                     f"Failed to send message to channel {channel_id} in guild {server_id}. Status code: {response.status_code}"
                 )
 
