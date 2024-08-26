@@ -110,7 +110,7 @@ class App:
                         for i in range(min(len(ranks), 5)):
                             user = await self.CLIENT.fetch_user(ranks[i][0])
                             f2.write(
-                                f"{ user.global_name},{ranks[i][1]},{user.avatar.url}"
+                                f"{user.global_name},{ranks[i][1]},{user.avatar.url}"
                             )
                             f2.write("\n")
             embed = discord.Embed(title="Global leaderboard (Updates every 4 hours)")
