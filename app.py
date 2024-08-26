@@ -109,9 +109,7 @@ class App:
                         f2.write("\n")
                         for i in range(min(len(ranks), 5)):
                             user = await self.CLIENT.fetch_user(ranks[i][0])
-                            f2.write(
-                                f"{ user.global_name},{ranks[i][1]},{user.avatar.url}"
-                            )
+                            f2.write(f"{ user.id},{ranks[i][1]},{user.avatar.url}")
                             f2.write("\n")
             embed = discord.Embed(title="Global leaderboard (Updates every 4 hours)")
             embed.color = discord.Color.brand_green()
@@ -119,11 +117,11 @@ class App:
                 lines = f.readlines()
                 rank = 1
                 for i in lines[1:]:
-                    username, points, avatar = i.split(",")
+                    user_id, points, avatar = i.split(",")
                     if not embed.thumbnail.url:
                         embed.set_thumbnail(url=avatar)
                     embed.add_field(
-                        value=f"#{rank}.    @{username}    {points} coins 💰",
+                        value=f"#{rank}.    {(await self.CLIENT.fetch_user(user_id)).mention}    {points} coins 💰",
                         name="",
                         inline=False,
                     )

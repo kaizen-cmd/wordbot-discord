@@ -10,6 +10,8 @@ from MultiServerWordChainDB import MultiServerWordChainDB
 
 import logging
 
+import asyncio
+
 logger = logging.getLogger(__name__)
 
 
@@ -57,20 +59,26 @@ class WordChainClient(commands.AutoShardedBot):
                 server_id=server.id, word=content, player_id=author.id
             )
 
+            coroutines = list()
             if result:
-                await message.add_reaction("✅")
+                coroutines.append(message.add_reaction("✅"))
+                coroutines.append(message.add_reaction("💰"))
                 if len(string_message) == 1:
-                    await message.reply(
-                        f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
+                    coroutines.append(
+                        message.reply(
+                            f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
+                        )
                     )
 
             else:
-                await message.add_reaction("❌")
-                await message.reply(string_message)
+                coroutines.append(message.add_reaction("❌"))
+                coroutines.append(message.reply(string_message))
         except Exception as e:
             logger.error(
                 f"MESSAGE PROCESSING: {message.content} == {e} == {message.guild.name}"
             )
+
+        await asyncio.gather(*coroutines)
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         self.db.deboard_server(server.id)
