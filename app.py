@@ -123,7 +123,7 @@ class App:
                     if not embed.thumbnail.url:
                         embed.set_thumbnail(url=avatar)
                     embed.add_field(
-                        value=f"#{rank}.    @{username}    {points} points",
+                        value=f"#{rank}.    @{username}    {points} coins 💰",
                         name="",
                         inline=False,
                     )
@@ -132,11 +132,11 @@ class App:
 
         @self.CLIENT.tree.command(
             name="vote",
-            description="vote on top.gg to get double points for next 5 words",
+            description="vote on top.gg to get double coins 💰 for next 5 words",
         )
         async def send_vote_link(interaction: discord.Interaction):
             await interaction.response.send_message(
-                "Vote on https://top.gg/bot/1225490759432798320 to get double points on next 5 accepted words"
+                "Vote on https://top.gg/bot/1225490759432798320 to get double coins 💰 on next 5 accepted words"
             )
 
         @self.CLIENT.tree.command(
@@ -149,10 +149,10 @@ class App:
                 "**1**. Check the previous accepted word.\n"
                 "**2**. Using the last letter of that write a new word.\n"
                 "**3**. NO CONSECUTIVE TURNS ALLOWED.\n"
-                "**4**. 7 or more characters in the word = 6 points.\n"
-                "**5**. 6 or lesser characters in the word = 4 points.\n"
-                "**6**. Same starting and ending letter = Additional 2 points.\n"
-                "**7**. Out of turn, wrong word in the chain = **2 points will be deducted**.\n"
+                "**4**. 7 or more characters in the word = 6 coins 💰.\n"
+                "**5**. 6 or lesser characters in the word = 4 coins 💰.\n"
+                "**6**. Same starting and ending letter = Additional 2 coins 💰.\n"
+                "**7**. Out of turn, wrong word in the chain = **2 coins 💰 will be deducted**.\n"
                 "**8**. Word length has to be greater than 3.\n\n"
                 "**User Commands**\n"
                 "```\n"
@@ -161,7 +161,7 @@ class App:
                 "/server_leaderboard - Get server rankings\n"
                 "/global_leaderboard - Get global rankings\n"
                 "/meaning <word>\n"
-                "/vote - Get double points for next 5 words\n"
+                "/vote - Get double coins 💰 for next 5 words\n"
                 "```\n"
                 "**Admin Commands**\n"
                 "```\n"

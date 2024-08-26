@@ -127,7 +127,7 @@ class MultiServerWordChainDB:
             self.conn.commit()
             return (
                 False,
-                f"It is not your turn. **{self.negative_marks} points deducted**",
+                f"It is not your turn. **{self.negative_marks} coins 💰 deducted**",
             )
 
         if last_char and word[0] != last_char:
@@ -138,7 +138,7 @@ class MultiServerWordChainDB:
             self.conn.commit()
             return (
                 False,
-                f"Write a word starting with {last_char}. **{self.negative_marks} points deducted**",
+                f"Write a word starting with {last_char}. **{self.negative_marks} coins 💰 deducted**",
             )
 
         word_result = self.curr.execute(

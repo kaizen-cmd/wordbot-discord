@@ -70,7 +70,7 @@ def vote_callback():
     channel_id = create_dm_channel(user_id)
     send_dm(
         channel_id,
-        f"Thanks for voting, you'll get double points for next {voting_record.word_count} words",
+        f"Thanks for voting, you'll get double coins 💰 for next {voting_record.word_count} words",
     )
 
     return "Success"

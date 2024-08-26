@@ -141,7 +141,7 @@ class WordChainClient(commands.AutoShardedBot):
                     f"Error in setting leaderboard thumbnail for user {user.global_name}"
                 )
             embed.add_field(
-                value=f"#{rank}.    @{user.global_name}    {score} points",
+                value=f"#{rank}.        {user.mention}         {score} coins 💰",
                 name="",
                 inline=False,
             )
@@ -156,7 +156,7 @@ class WordChainClient(commands.AutoShardedBot):
         id, score, rank = data
         embed = discord.Embed(title=f"{author.global_name}'s score")
         embed.add_field(
-            value=f"Rank {rank}.    @{author.global_name}    {score} points",
+            value=f"Rank {rank}.    @{author.global_name}    {score} coins 💰",
             name="",
             inline=False,
         )
@@ -192,10 +192,10 @@ class WordChainClient(commands.AutoShardedBot):
             "**1**. Check the previous accepted word.\n"
             "**2**. Using the last letter of that write a new word.\n"
             "**3**. NO CONSECUTIVE TURNS ALLOWED.\n"
-            "**4**. 7 or more characters in the word = 6 points.\n"
-            "**5**. 6 or lesser characters in the word = 4 points.\n"
-            "**6**. Same starting and ending letter = Additional 2 points.\n"
-            "**7**. Out of turn, wrong word in the chain = **2 points will be deducted**.\n"
+            "**4**. 7 or more characters in the word = 6 coins 💰.\n"
+            "**5**. 6 or lesser characters in the word = 4 coins 💰.\n"
+            "**6**. Same starting and ending letter = Additional 2 coins 💰.\n"
+            "**7**. Out of turn, wrong word in the chain = **2 coins 💰 will be deducted**.\n"
             "**8**. Word length has to be greater than 3.\n\n"
             "**User Commands**\n"
             "```\n"
@@ -205,7 +205,7 @@ class WordChainClient(commands.AutoShardedBot):
             "```\n"
             "**Slash Commands**\n"
             "```\n"
-            "/vote - Get double points for next 5 words\n"
+            "/vote - Get double coins 💰 for next 5 words\n"
             "/global_leaderboard - Get global rankings\n"
             "```\n"
             "**Admin Commands**\n"
