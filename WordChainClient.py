@@ -231,11 +231,3 @@ class WordChainClient(commands.AutoShardedBot):
             return False
         word = words[0]
         return word.isalpha()
-
-
-def construct_client():
-    intents = discord.Intents.default()
-    intents.messages = True
-    intents.message_content = True
-    client = WordChainClient(intents=intents, command_prefix="/")
-    return client

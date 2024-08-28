@@ -1,7 +1,7 @@
 import logging
 import os
 
-from WordChainClient import construct_client
+from WordChainClient import WordChainClient
 from dotenv import load_dotenv
 
 import datetime
@@ -26,13 +26,18 @@ logger = logging.getLogger("app")
 
 class App:
 
-    TOKEN = ""
-    CLIENT = construct_client()
-
     def __init__(self, token) -> None:
+        self.CLIENT = self._constrcut_client()
         App.TOKEN = token
+        self._add_slash_commands()
 
-    def add_slash_commands(self):
+    def _constrcut_client(self):
+        intents = discord.Intents.default()
+        intents.messages = True
+        intents.message_content = True
+        return WordChainClient(intents=intents, command_prefix="/")
+
+    def _add_slash_commands(self):
 
         @self.CLIENT.tree.command(
             name="activate", description="start the word chain game in this channel"
@@ -199,13 +204,14 @@ class App:
             description="get leaderboard for the current server",
         )
         async def server_leaderboard(interaction: discord.Interaction):
+            await interaction.response.defer(thinking=True)
             message = await self.CLIENT._construct_and_send_leader_board(
                 interaction.guild
             )
             if type(message) == str:
-                await interaction.response.send_message(message)
+                await interaction.followup.send(message)
                 return
-            await interaction.response.send_message(embed=message)
+            await interaction.followup.send(embed=message)
 
         @self.CLIENT.tree.command(
             name="meaning",
@@ -218,12 +224,17 @@ class App:
                 return
             await interaction.response.send_message(embed=message)
 
+        @self.CLIENT.tree.command(
+            name="shop", description="Check out the gamingrefree shop"
+        )
+        async def shop(interaction: discord.Interaction):
+            await interaction.response.send_message("Launching SOON!")
+
     def run(self):
         self.CLIENT.run(App.TOKEN)
 
 
 if __name__ == "__main__":
     app = App(os.getenv("BOT_TOKEN"))
-    app.add_slash_commands()
     logger.info("Started Wordchain instance")
     app.run()
