@@ -212,7 +212,7 @@ class App:
             if type(message) == str:
                 await interaction.followup.send(message)
                 return
-            await interaction.followup.send(embed=message)
+            await interaction.followup.send(embed=message, view=VoteButton())
 
         @self.CLIENT.tree.command(
             name="meaning",
