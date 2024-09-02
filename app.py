@@ -1,9 +1,10 @@
+from buttons import VoteButton
+
 import datetime
 import logging
 import os
 
 import discord
-from discord import app_commands
 from dotenv import load_dotenv
 
 from WordChainClient import WordChainClient
@@ -131,7 +132,7 @@ class App:
                         inline=False,
                     )
                     rank += 1
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.send_message(embed=embed, view=VoteButton())
 
         @self.CLIENT.tree.command(
             name="vote",
@@ -197,7 +198,7 @@ class App:
             if type(message) == str:
                 await interaction.response.send_message(message)
                 return
-            await interaction.response.send_message(embed=message)
+            await interaction.response.send_message(embed=message, view=VoteButton())
 
         @self.CLIENT.tree.command(
             name="server_leaderboard",
