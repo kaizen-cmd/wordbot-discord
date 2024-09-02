@@ -1,7 +1,8 @@
-import os
-import requests
-import sqlite3
 import json
+import os
+import sqlite3
+
+import requests
 
 conn = sqlite3.connect("db.sqlite3")
 curr = conn.cursor()

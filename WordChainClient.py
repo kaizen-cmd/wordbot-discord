@@ -1,4 +1,6 @@
+import asyncio
 import json
+import logging
 import logging.handlers
 import os
 
@@ -7,10 +9,6 @@ import requests
 from discord.ext import commands
 
 from MultiServerWordChainDB import MultiServerWordChainDB
-
-import logging
-
-import asyncio
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,7 @@
 import logging
-import sqlite3
-from collections import defaultdict
 import random
-from collections import namedtuple
+import sqlite3
+from collections import defaultdict, namedtuple
 
 logger = logging.getLogger(__name__)
 

@@ -4,11 +4,12 @@ python send_custom_message.py broadcast --message "Your message here"
 python send_custom_message.py single --message "Your message here" --server SERVER_ID
 """
 
-import requests
-import os
-import json
 import argparse
+import json
 import logging
+import os
+
+import requests
 
 f = open("./server_channel_mapping.json", "r")
 server_channel_mapping = json.loads(f.read())

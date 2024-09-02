@@ -1,14 +1,12 @@
+import datetime
 import logging
 import os
 
-from WordChainClient import WordChainClient
+import discord
+from discord import app_commands
 from dotenv import load_dotenv
 
-import datetime
-
-import discord
-
-from discord import app_commands
+from WordChainClient import WordChainClient
 
 if ".env" not in os.listdir():
     raise Exception(".env not found")

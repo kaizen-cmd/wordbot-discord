@@ -2,8 +2,8 @@
 Usage: python3 exhaust_words_cli.py --letter <letter> --server_id <server_id>
 """
 
-import sqlite3
 import argparse
+import sqlite3
 
 
 def exhaust_words_beginning_with(letter, server_id):

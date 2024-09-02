@@ -1,12 +1,14 @@
-import os
-from flask import Flask, request, render_template, session, redirect
-from scripts.send_dm import create_dm_channel, send_dm
-from scripts.get_bot_guilds import get_bot_guilds
-from scripts.send_custom_message import send_to_server, broadcast
 import logging
+import multiprocessing
+import os
 import sqlite3
 from collections import namedtuple
-import multiprocessing
+
+from flask import Flask, redirect, render_template, request, session
+
+from scripts.get_bot_guilds import get_bot_guilds
+from scripts.send_custom_message import broadcast, send_to_server
+from scripts.send_dm import create_dm_channel, send_dm
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +113,8 @@ def broadcast_message():
     if session.get("authenticated") != True:
         return redirect("/admin")
     data = request.form
-    broadcast(data.get("broadcast_message"))
+    message = data.get("broadcast_message")
+    multiprocessing.Process(target=broadcast, args=(message,), daemon=False).start()
     return redirect("/admin")
 
 
