@@ -186,18 +186,29 @@
       <table id="serverTable">
         <thead>
           <tr>
-            <th>Sr No.</th>
             <th>Server Name</th>
-            <th>Server ID</th>
+            <th>Activation Staus</th>
+            <th>Member Count</th>
             <th>Send Message</th>
           </tr>
         </thead>
         <tbody>
           {% for server in servers %}
           <tr>
-            <td>{{ loop.index }}</td>
             <td>{{ server.name }}</td>
-            <td>{{ server.id }}</td>
+            <td>
+              {% if server.activation_status %}
+              <div
+                style="width: 15px; height: 15px; background-color: rgb(18, 234, 18); margin: 0 auto; color: #00695d00">
+                {{server.activation_status}}
+              </div>
+              {% else %}
+              <div style="width: 15px; height: 15px; background-color: red; margin: 0 auto; color: #00695d00">
+                {{server.activation_status}}
+              </div>
+              {% endif %}
+            </td>
+            <td>{{ server.member_count }}</td>
             <td>
               <form action="/send_message" method="POST">
                 <input type="hidden" name="server_id" value="{{ server.id }}" />
