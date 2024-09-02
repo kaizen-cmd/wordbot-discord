@@ -99,6 +99,7 @@
       td {
         padding: 12px 15px;
         text-align: center;
+        cursor: pointer;
       }
 
       tr:nth-child(even) {
@@ -126,7 +127,7 @@
         const tr = table.getElementsByTagName("tr");
 
         for (let i = 1; i < tr.length; i++) {
-          const td = tr[i].getElementsByTagName("td")[1]; // Get the server name column
+          const td = tr[i].getElementsByTagName("td")[0]; // Get the server name column
           if (td) {
             const textValue = td.textContent || td.innerText;
             if (textValue.toUpperCase().indexOf(input) > -1) {
@@ -151,6 +152,28 @@
         }
 
         document.getElementById("totalServers").innerText = count;
+      }
+
+      // Function to sort the table by the member count column
+      let sortOrder = true; // true for ascending, false for descending
+
+      function sortTable() {
+        const table = document.getElementById("serverTable");
+        const rows = Array.from(table.rows).slice(1); // Get all rows except the header
+        const index = 2; // Member count column index
+
+        rows.sort((a, b) => {
+          const aVal = parseInt(a.cells[index].innerText) || 0;
+          const bVal = parseInt(b.cells[index].innerText) || 0;
+
+          return sortOrder ? aVal - bVal : bVal - aVal;
+        });
+
+        // Reattach sorted rows
+        rows.forEach((row) => table.appendChild(row));
+
+        // Toggle sort order
+        sortOrder = !sortOrder;
       }
 
       // Call countServers function when the page loads
@@ -187,8 +210,8 @@
         <thead>
           <tr>
             <th>Server Name</th>
-            <th>Activation Staus</th>
-            <th>Member Count</th>
+            <th>Activation Status</th>
+            <th onclick="sortTable()">Member Count</th>
             <th>Send Message</th>
           </tr>
         </thead>
