@@ -26,7 +26,7 @@ class App:
 
     def __init__(self, token) -> None:
         self.CLIENT = self._constrcut_client()
-        App.TOKEN = token
+        self.TOKEN = token
         self._add_slash_commands()
 
     def _constrcut_client(self):
@@ -190,7 +190,9 @@ class App:
         @self.CLIENT.tree.command(
             name="score", description="get score of the mentioned user"
         )
-        async def score(interaction: discord.Interaction, user: discord.User):
+        async def score(interaction: discord.Interaction, user: discord.User | None):
+            if not user:
+                user = interaction.user
             message = self.CLIENT._send_user_score(user, interaction.guild)
             if type(message) == str:
                 await interaction.response.send_message(message)
@@ -229,7 +231,7 @@ class App:
             await interaction.response.send_message("Launching SOON!")
 
     def run(self):
-        self.CLIENT.run(App.TOKEN)
+        self.CLIENT.run(self.TOKEN)
 
 
 if __name__ == "__main__":
