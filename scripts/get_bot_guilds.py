@@ -16,14 +16,22 @@ def get_bot_guilds():
     last_id = -1
     result = list()
     api_call_fails = 0
-
+    response = None
     while api_call_fails < 5:
         if last_id == -1:
-            response = requests.get(url, headers=headers)
+            try:
+                response = requests.get(url, headers=headers)
+            except:
+                api_call_fails += 1
+                continue
         else:
-            response = requests.get(f"{url}&after={last_id}", headers=headers)
+            try:
+                response = requests.get(f"{url}&after={last_id}", headers=headers)
+            except:
+                api_call_fails += 1
+                continue
 
-        if response.status_code == 200:
+        if response and response.status_code == 200:
             guilds = response.json()
             if guilds:
                 last_id = guilds[-1]["id"]

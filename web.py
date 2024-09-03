@@ -1,6 +1,8 @@
+import datetime
 import logging
 import multiprocessing
 import os
+import re
 import sqlite3
 from collections import namedtuple
 
@@ -89,7 +91,41 @@ def admin():
         if not session.get("authenticated") == True:
             return render_template("login.html")
         servers = get_bot_guilds()
-        return render_template("admin.html", servers=servers)
+        active_members = 0
+        with open("active_members.txt", "+r") as f:
+            last_time = datetime.datetime.strptime(
+                f.readline().strip(), "%d/%m/%Y, %H:%M:%S"
+            )
+            if datetime.datetime.now() - last_time < datetime.timedelta(hours=4):
+                active_members = int(f.readline().strip())
+            else:
+                conn = sqlite3.connect("db.sqlite3")
+                curr = conn.cursor()
+                curr.execute("SELECT name FROM sqlite_master WHERE type='table';")
+                tables = curr.fetchall()
+
+                # Compile the regex pattern for matching table names
+                pattern = re.compile(r"^users_[1-9]+$")
+
+                # Iterate over tables, match the pattern, and count rows
+                for table in tables:
+                    table_name = table[0]
+                    if pattern.match(table_name):
+                        curr.execute(f"SELECT COUNT(*) FROM {table_name};")
+                        count = curr.fetchone()[0]
+                        active_members += count
+
+                curr.close()
+                conn.close()
+
+                with open("active_members.txt", "w") as f2:
+                    f2.write(datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+                    f2.write("\n")
+                    f2.write(str(active_members))
+
+        return render_template(
+            "admin.html", servers=servers, active_members=active_members
+        )
     elif request.method == "POST":
         data = request.form
         username = data.get("username")

@@ -1,5 +1,3 @@
-from buttons import VoteButton
-
 import datetime
 import logging
 import os
@@ -7,6 +5,7 @@ import os
 import discord
 from dotenv import load_dotenv
 
+from buttons import VoteButton
 from WordChainClient import WordChainClient
 
 if ".env" not in os.listdir():

@@ -34,7 +34,7 @@
       }
 
       .broadcast-section {
-        margin-bottom: 30px;
+        margin-bottom: 10px;
       }
 
       .stats-section {
@@ -44,7 +44,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
       }
 
       .stats-section h3 {
@@ -128,9 +128,12 @@
 
         for (let i = 1; i < tr.length; i++) {
           const td = tr[i].getElementsByTagName("td")[0]; // Get the server name column
+          const activation = tr[i].getElementsByTagName("td")[1]; // Get the server activation status
+
           if (td) {
             const textValue = td.textContent || td.innerText;
-            if (textValue.toUpperCase().indexOf(input) > -1) {
+            const activationValue = activation.textContent.trim();
+            if (textValue.toUpperCase().indexOf(input) > -1 || activationValue.toUpperCase().indexOf(input) > -1) {
               tr[i].style.display = "";
             } else {
               tr[i].style.display = "none";
@@ -176,23 +179,58 @@
         sortOrder = !sortOrder;
       }
 
+      let sortActivationOrder = true; // true for ascending, false for descending
+      function sortActivationColumn() {
+        const table = document.getElementById("serverTable");
+        const rows = Array.from(table.rows).slice(1); // Get all rows except the header
+        const index = 1; // Member count column index
+
+        rows.sort((a, b) => {
+          const aVal = a.cells[index].textContent.trim() === "False" ? 0 : 1;
+          const bVal = b.cells[index].textContent.trim() === "False" ? 0 : 1;
+
+          return sortActivationOrder ? aVal - bVal : bVal - aVal;
+        });
+
+        // Reattach sorted rows
+        rows.forEach((row) => table.appendChild(row));
+
+        // Toggle sort order
+        sortActivationOrder = !sortActivationOrder;
+      }
+
+      function copyServerID(serverID) {
+        navigator.clipboard.writeText(serverID);
+      }
+
       // Call countServers function when the page loads
       window.onload = countServers;
     </script>
   </head>
   <body>
     <div class="container broadcast-section">
-      <!-- Broadcast Message Text Box -->
-      <h2>Broadcast Message to All Servers</h2>
+      <h2>Broadcast Message</h2>
       <form action="/broadcast" method="POST">
-        <input type="text" name="broadcast_message" placeholder="Enter message" style="width: 100%" />
+        <input type="text" name="broadcast_message" placeholder="Enter message" style="width: 100%" required />
         <button type="submit" style="margin-top: 10px">Send Broadcast</button>
       </form>
     </div>
 
+    <div class="container broadcast-section">
+      <h2>Unicast Message</h2>
+      <form action="/send_message" method="POST">
+        <input type="text" name="server_id" placeholder="Enter Server ID" style="width: 100%" required />
+        <input type="text" name="message" placeholder="Enter message" style="width: 100%; margin-top: 10px" required />
+        <button type="submit" style="margin-top: 10px">Send Message</button>
+      </form>
+    </div>
+
     <div class="container stats-section">
-      <!-- Stats Section -->
       <h3>Total Servers: <span id="totalServers"></span></h3>
+    </div>
+
+    <div class="container stats-section">
+      <h3>Total Active Members: {{active_members}}</h3>
     </div>
 
     <div class="container">
@@ -202,23 +240,22 @@
           type="text"
           id="serverSearchInput"
           onkeyup="searchServers(); countServers();"
-          placeholder="Search for server names" />
+          placeholder="Search for server names / activation status" />
       </div>
 
       <!-- Server List Table -->
       <table id="serverTable">
         <thead>
           <tr>
-            <th>Server Name</th>
-            <th>Activation Status</th>
+            <th>Server Name (Click to copy ID)</th>
+            <th onclick="sortActivationColumn()">Activation Status</th>
             <th onclick="sortTable()">Member Count</th>
-            <th>Send Message</th>
           </tr>
         </thead>
         <tbody>
           {% for server in servers %}
           <tr>
-            <td>{{ server.name }}</td>
+            <td onclick="copyServerID('{{ server.id }}')">{{ server.name }}</td>
             <td>
               {% if server.activation_status %}
               <div
@@ -232,13 +269,6 @@
               {% endif %}
             </td>
             <td>{{ server.member_count }}</td>
-            <td>
-              <form action="/send_message" method="POST">
-                <input type="hidden" name="server_id" value="{{ server.id }}" />
-                <input type="text" name="message" placeholder="Enter message" style="width: 150px" />
-                <button type="submit">Send</button>
-              </form>
-            </td>
           </tr>
           {% endfor %}
         </tbody>
