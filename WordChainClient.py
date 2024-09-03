@@ -155,7 +155,7 @@ class WordChainClient(commands.AutoShardedBot):
                 inline=False,
             )
 
-        embed.set_footer(text=f"GamingRefree made this")
+        embed.set_footer(text=f"Made by GamingRefree Inc.")
         return embed
 
     def _send_user_score(self, author: discord.User, server: discord.Guild):
@@ -170,7 +170,7 @@ class WordChainClient(commands.AutoShardedBot):
             inline=False,
         )
         embed.set_thumbnail(url=author.avatar.url)
-        embed.set_footer(text=f"GamingRefree made this")
+        embed.set_footer(text=f"Made by GamingRefree Inc.")
         embed.colour = discord.Color.dark_teal()
         return embed
 
@@ -189,7 +189,7 @@ class WordChainClient(commands.AutoShardedBot):
                 embed = discord.Embed(title=f"Meaning of the word {word}")
                 embed.add_field(name=word, value=meaning)
                 embed.colour = discord.Color.dark_blue()
-                embed.set_footer(text=f"GamingRefree made this")
+                embed.set_footer(text=f"Made by GamingRefree Inc.")
                 return embed
             except:
                 return f"The language expert is not avaialable at the moment"

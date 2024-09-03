@@ -53,7 +53,8 @@
       }
 
       /* Form & Buttons */
-      input[type="text"] {
+      input,
+      textarea {
         padding: 10px;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -117,6 +118,11 @@
       .search-bar input {
         flex-grow: 1;
         margin-right: 10px;
+      }
+      .embed-form input,
+      .embed-form textarea {
+        width: 100%;
+        margin-bottom: 10px;
       }
     </style>
     <script>
@@ -208,6 +214,39 @@
     </script>
   </head>
   <body>
+    <div class="container broadcast-section">
+      <h2>Broadcast Embed</h2>
+      <form action="/broadcast-embed" class="embed-form" method="post">
+        <input type="text" name="title" placeholder="Title" required />
+        <textarea
+          type="text"
+          name="description"
+          placeholder="Description"
+          rows="4"
+          style="resize: none"
+          required></textarea>
+        <input type="url" name="image" placeholder="Image" />
+        <button type="submit">Broadcast Embed</button>
+      </form>
+    </div>
+
+    <div class="container broadcast-section">
+      <h2>Unicast Embed</h2>
+      <form action="/unicast-embed" class="embed-form" method="post">
+        <input type="text" name="server_id" placeholder="Server ID" required />
+        <input type="text" name="title" placeholder="Title" required />
+        <textarea
+          type="text"
+          name="description"
+          placeholder="Description"
+          rows="4"
+          style="resize: none"
+          required></textarea>
+        <input type="url" name="image" placeholder="Image" />
+        <button type="submit">Unicast Embed</button>
+      </form>
+    </div>
+
     <div class="container broadcast-section">
       <h2>Broadcast Message</h2>
       <form action="/broadcast" method="POST">

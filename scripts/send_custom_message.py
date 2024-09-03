@@ -39,6 +39,25 @@ def send_to_server(message="Hello World!", server_id="1234116258186657872"):
             )
 
 
+def send_embed_to_server(message="Hello World!", server_id="1234116258186657872"):
+    global server_channel_mapping
+    global headers
+    channel_id = server_channel_mapping.get(server_id)
+    if channel_id:
+        data = {"embed": message}
+        response = requests.post(
+            f"https://discord.com/api/v9/channels/{channel_id}/messages",
+            headers=headers,
+            json=data,
+        )
+        if response.status_code == 200:
+            print(f"Message sent to channel {channel_id} in guild {server_id}")
+        else:
+            print(
+                f"Failed to send message to channel {channel_id} in guild {server_id}. Status code: {response.status_code}"
+            )
+
+
 def broadcast(message="Hello!"):
     logging.basicConfig(
         filename="broadcast.log",
@@ -57,6 +76,45 @@ def broadcast(message="Hello!"):
         channel_id = server_channel_mapping.get(server_id)
         if channel_id:
             data = {"content": message}
+
+            response = requests.post(
+                f"https://discord.com/api/v9/channels/{channel_id}/messages",
+                headers=headers,
+                json=data,
+            )
+
+            if response.status_code == 200:
+                logger.info(
+                    f"Message sent to channel {channel_id} in guild {server['name']}"
+                )
+            else:
+                logger.error(
+                    f"Failed to send message to channel {channel_id} in guild {server_id}. Status code: {response.status_code}"
+                )
+
+
+def broadcast_embed(message="Hello!"):
+    logging.basicConfig(
+        filename="broadcast.log",
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+    logger = logging.getLogger("broadcast_message_log")
+    global server_channel_mapping
+    global headers
+    response = requests.get(
+        "https://discord.com/api/v9/users/@me/guilds", headers=headers
+    )
+    servers = response.json()
+    for server in servers:
+        server_id = server["id"]
+        channel_id = server_channel_mapping.get(server_id)
+        if channel_id:
+            data = {
+                "embeds": [
+                    message,
+                ]
+            }
 
             response = requests.post(
                 f"https://discord.com/api/v9/channels/{channel_id}/messages",

@@ -2,14 +2,19 @@ import datetime
 import logging
 import multiprocessing
 import os
-import re
+import discord
 import sqlite3
 from collections import namedtuple
 
 from flask import Flask, redirect, render_template, request, session
 
 from scripts.get_bot_guilds import get_bot_guilds
-from scripts.send_custom_message import broadcast, send_to_server
+from scripts.send_custom_message import (
+    broadcast,
+    send_to_server,
+    broadcast_embed,
+    send_embed_to_server,
+)
 from scripts.send_dm import create_dm_channel, send_dm
 
 logging.basicConfig(
@@ -171,6 +176,64 @@ def broadcast_message():
     data = request.form
     message = data.get("broadcast_message")
     multiprocessing.Process(target=broadcast, args=(message,), daemon=False).start()
+    return redirect("/admin")
+
+
+@app.route("/broadcast-embed", methods=["POST"])
+def broadcast_embed_():
+    data = request.form
+
+    embed = discord.Embed(
+        title=data.get("title"),
+        url="https://gamingrefree.online",
+        description=data.get("description"),
+        colour=0x1EEB36,
+    )
+
+    embed.set_author(
+        name="GamingRefree",
+        url="https://gamingrefree.online",
+        icon_url="https://i.imgur.com/O5rRjUu.png",
+    )
+    if data.get("image"):
+        embed.set_image(url=data.get("image"))
+
+    embed.set_footer(
+        text="Made by GamingRefree Inc.", icon_url="https://i.imgur.com/O5rRjUu.png"
+    )
+
+    multiprocessing.Process(
+        target=broadcast_embed, args=(embed.to_dict(),), daemon=False
+    ).start()
+
+    return redirect("/admin")
+
+
+@app.route("/unicast-embed", methods=["POST"])
+def unicast_embed():
+    data = request.form
+    server_id = data.get("server_id")
+    embed = discord.Embed(
+        title=data.get("title"),
+        url="https://gamingrefree.online",
+        description=data.get("description"),
+        colour=0x1EEB36,
+    )
+
+    embed.set_author(
+        name="GamingRefree",
+        url="https://gamingrefree.online",
+        icon_url="https://i.imgur.com/O5rRjUu.png",
+    )
+    if data.get("image"):
+        embed.set_image(url=data.get("image"))
+
+    embed.set_footer(
+        text="Made by GamingRefree Inc.", icon_url="https://i.imgur.com/O5rRjUu.png"
+    )
+
+    send_embed_to_server(embed.to_dict(), server_id)
+
     return redirect("/admin")
 
 
