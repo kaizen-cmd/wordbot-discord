@@ -97,28 +97,33 @@ def admin():
             return render_template("login.html")
         servers = get_bot_guilds()
         active_members = 0
+        server_active_users_map = dict()
         with open("active_members.txt", "+r") as f:
             last_time = datetime.datetime.strptime(
                 f.readline().strip(), "%d/%m/%Y, %H:%M:%S"
             )
             if datetime.datetime.now() - last_time < datetime.timedelta(hours=4):
                 active_members = int(f.readline().strip())
+                line = f.readline()
+                while line:
+                    line = line.strip()
+                    server_id, member_count = line.split(" ")
+                    server_active_users_map[server_id] = member_count
+                    line = f.readline()
             else:
                 conn = sqlite3.connect("db.sqlite3")
                 curr = conn.cursor()
-                curr.execute("SELECT name FROM sqlite_master WHERE type='table';")
+                curr.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'users_%';"
+                )
                 tables = curr.fetchall()
 
-                # Compile the regex pattern for matching table names
-                pattern = re.compile(r"^users_[0-9]*$")
-
-                # Iterate over tables, match the pattern, and count rows
                 for table in tables:
                     table_name = table[0]
-                    if pattern.match(table_name):
-                        curr.execute(f"SELECT COUNT(*) FROM {table_name};")
-                        count = curr.fetchone()[0]
-                        active_members += count
+                    curr.execute(f"SELECT COUNT(*) FROM {table_name};")
+                    count = curr.fetchone()[0]
+                    server_active_users_map[table_name.split("_")[1]] = count
+                    active_members += count
 
                 curr.close()
                 conn.close()
@@ -127,6 +132,16 @@ def admin():
                     f2.write(datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
                     f2.write("\n")
                     f2.write(str(active_members))
+                    f2.write("\n")
+                    for server_id, member_count in list(
+                        server_active_users_map.items()
+                    ):
+                        f2.write(f"{server_id} {member_count}\n")
+
+        for server in servers:
+            server["active_members"] = server_active_users_map.get(
+                str(server["id"]), "DataNA"
+            )
 
         return render_template(
             "admin.html", servers=servers, active_members=active_members

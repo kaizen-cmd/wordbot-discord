@@ -250,6 +250,7 @@
             <th>Server Name (Click to copy ID)</th>
             <th onclick="sortActivationColumn()">Activation Status</th>
             <th onclick="sortTable()">Member Count</th>
+            <th>Active Member Count</th>
           </tr>
         </thead>
         <tbody>
@@ -269,6 +270,7 @@
               {% endif %}
             </td>
             <td>{{ server.member_count }}</td>
+            <td>{{ server.active_members }}</td>
           </tr>
           {% endfor %}
         </tbody>
