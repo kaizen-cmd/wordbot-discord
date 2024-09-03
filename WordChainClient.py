@@ -79,7 +79,10 @@ class WordChainClient(commands.AutoShardedBot):
         await asyncio.gather(*coroutines)
 
     async def on_guild_remove(self, server: discord.guild.Guild):
-        self.db.deboard_server(server.id)
+        try:
+            self.db.deboard_server(server.id)
+        except:
+            pass
         await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
             f"Server {server.name} kicked the bot"
         )

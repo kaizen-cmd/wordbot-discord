@@ -12,6 +12,11 @@ from scripts.get_bot_guilds import get_bot_guilds
 from scripts.send_custom_message import broadcast, send_to_server
 from scripts.send_dm import create_dm_channel, send_dm
 
+logging.basicConfig(
+    filename="web.log",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
