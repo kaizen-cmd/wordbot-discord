@@ -110,7 +110,7 @@ def admin():
                 tables = curr.fetchall()
 
                 # Compile the regex pattern for matching table names
-                pattern = re.compile(r"r'^users_[0-9]*$'")
+                pattern = re.compile(r"^users_[0-9]*$")
 
                 # Iterate over tables, match the pattern, and count rows
                 for table in tables:
