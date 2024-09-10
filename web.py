@@ -155,7 +155,7 @@ def admin():
         data = request.form
         username = data.get("username")
         password = data.get("password")
-        if username == "slav" and password == "slavoid":
+        if username == "slav" and password == "Konnichiwa@11Hajimimashte@11":
             session["authenticated"] = True
         return redirect("/admin")
 
@@ -181,6 +181,8 @@ def broadcast_message():
 
 @app.route("/broadcast-embed", methods=["POST"])
 def broadcast_embed_():
+    if session.get("authenticated") != True:
+        return redirect("/admin")
     data = request.form
 
     embed = discord.Embed(
@@ -211,6 +213,8 @@ def broadcast_embed_():
 
 @app.route("/unicast-embed", methods=["POST"])
 def unicast_embed():
+    if session.get("authenticated") != True:
+        return redirect("/admin")
     data = request.form
     server_id = data.get("server_id")
     embed = discord.Embed(
