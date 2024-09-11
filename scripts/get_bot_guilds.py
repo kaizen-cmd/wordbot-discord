@@ -48,6 +48,7 @@ def get_bot_guilds():
                         "id": guild["id"],
                         "member_count": guild["approximate_member_count"],
                         "activation_status": activation_status,
+                        "icons": guild["icon"],
                     }
                 )
         else:

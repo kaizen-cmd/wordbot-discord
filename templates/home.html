@@ -3,147 +3,349 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wordchain Bot - GamingRefree</title>
-    <style>
-      body {
-        font-family: "Arial", sans-serif;
-        background-color: #1e1e2f;
-        color: #f0f0f0;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .container {
-        background-color: #2e2e3e;
-        border-radius: 12px;
-        padding: 40px;
-        max-width: 800px;
-        text-align: center;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
-      }
-      h1 {
-        color: #ff9900;
-        font-size: 48px;
-        margin-bottom: 20px;
-      }
-      p {
-        line-height: 1.6;
-        font-size: 18px;
-        margin-bottom: 10px;
-      }
-      .rules,
-      .commands {
-        background-color: #3e3e4f;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-      }
-      .commands {
-        display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-      }
-      .command-section {
-        margin-bottom: 20px;
-      }
-      .command-section h3 {
-        color: #ffcc00;
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-      code {
-        background-color: #1e1e2f;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 16px;
-        display: block;
-        color: #ffcc00;
-      }
-      .buttons {
-        margin-top: 30px;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-      }
-      .btn {
-        padding: 15px 30px;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        text-transform: uppercase;
-        transition: background-color 0.3s;
-      }
-      .btn-invite {
-        background-color: #ff5722;
-        color: white;
-      }
-      .btn-invite:hover {
-        background-color: #e64a19;
-      }
-      .btn-support {
-        background-color: #007bff;
-        color: white;
-      }
-      .btn-support:hover {
-        background-color: #0056b3;
-      }
-      a {
-        text-decoration: none;
-        color: inherit;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/ddc818993e.js" crossorigin="anonymous"></script>
+    <title>GamingRefree | Best Discord Bot</title>
+    <link rel="shortcut icon" href="{{url_for('static', filename='bot.gif')}}" type="image/x-icon" />
   </head>
+  <style>
+    body {
+      width: 100%;
+      margin: 0;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      background-color: #181c14;
+      outline: none;
+      font-family: "Montserrat", sans-serif;
+    }
+    #main {
+      width: 100%;
+      display: flex;
+    }
+    #summary {
+      width: 50%;
+      margin-top: 5%;
+      padding-left: 5%;
+      padding-right: 15%;
+    }
+    #logo img {
+      width: 120px;
+    }
+    h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      color: white;
+    }
+    #short-desc p {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.667);
+      text-align: justify;
+    }
+    #server-logos {
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: space-evenly;
+      width: 40%;
+    }
+    #line-1 {
+      display: flex;
+      flex-direction: column;
+    }
+    .logo {
+      margin: 0 0 20px 0;
+      animation: scroll 25s infinite;
+      animation-timing-function: linear;
+    }
+    .logo-2 {
+      margin: 0 0 20px 0;
+      animation: scroll-2 25s infinite;
+      animation-timing-function: linear;
+    }
+    @keyframes scroll {
+      0% {
+        transform: translateY(0%);
+      }
+      100% {
+        transform: translateY(-1750%);
+      }
+    }
+    @keyframes scroll-2 {
+      0% {
+        transform: translateY(-1750%);
+      }
+      100% {
+        transform: translateY(0%);
+      }
+    }
+    .logo img,
+    .logo-2 img {
+      border-radius: 10px;
+      width: 125px;
+    }
+    button {
+      background-color: #3e5ece;
+      color: white;
+      font-size: 1rem;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 10px;
+    }
+    button:hover {
+      cursor: pointer;
+    }
+    a {
+      text-decoration: none;
+    }
+  </style>
   <body>
-    <div class="container">
-      <h1>GamingRefree Wordchain Bot</h1>
-      <p>Welcome to the official homepage of the Wordchain Discord Bot, where every word counts!</p>
-      <div>
-        <img src="https://i.imgur.com/HLfacqZ.png" style="max-width: 100%" />
-      </div>
-      <div class="buttons">
-        <a href="https://top.gg/bot/1225490759432798320/vote" target="_blank">
-          <button class="btn btn-support">Vote - Get 2x coins 💰</button>
-        </a>
-        <a href="https://discord.com/oauth2/authorize?client_id=1225490759432798320&scope=bot" target="_blank">
-          <button class="btn btn-invite">Invite Bot</button>
-        </a>
-        <a href="https://discord.gg/BAnFejS7bQ" target="_blank">
-          <button class="btn btn-support">Join Support Server</button>
-        </a>
-      </div>
-      <br />
-      <div class="rules">
-        <h2>Wordchain Rules</h2>
-        <p>1. Check the previous accepted word.</p>
-        <p>2. Using the last letter of that write a new word.</p>
-        <p>3. NO CONSECUTIVE TURNS ALLOWED.</p>
-        <p>4. 7 or more characters in the word = 6 coins 💰.</p>
-        <p>5. 6 or lesser characters in the word = 4 coins 💰.</p>
-        <p>6. Same starting and ending letter = Additional 2 coins 💰.</p>
-        <p>7. Out of turn, wrong word in the chain = 2 coins 💰 will be deducted.</p>
-        <p>8. Word length has to be greater than 3.</p>
-      </div>
-      <div class="commands">
-        <div class="command-section">
-          <h3>User Commands</h3>
-          <code>@GamingRefree myscore</code>
-          <code>@GamingRefree score</code>
-          <code>@GamingRefree meaning &lt;word&gt;</code>
+    <div id="main">
+      <div id="summary">
+        <div id="logo">
+          <img src="{{url_for('static', filename='bot.gif')}}" />
         </div>
-        <div class="command-section">
-          <h3>Slash Commands</h3>
-          <code>/vote - Get double coins 💰 for next 5 words</code>
-          <code>/global_leaderboard - Get global rankings</code>
+        <div id="headline">
+          <h1>The Best WordChain And MiniGames Bot Of 5000+ Discord Servers</h1>
         </div>
-        <div class="command-section">
-          <h3>Admin Commands</h3>
-          <code>@GamingRefree activate</code>
-          <code>@GamingRefree deactivate</code>
-          <code>@GamingRefree exhaust &lt;letter&gt;</code>
+        <div id="short-desc">
+          <p>
+            Wordchain is a fun, interactive game where players build a chain of words, each starting with the last
+            letter of the previous word. Compete for coins, climb leaderboards, and unlock exciting in-game rewards!
+          </p>
+        </div>
+        <div id="buttons">
+          <a href="https://discord.com/oauth2/authorize?client_id=1225490759432798320&scope=bot" target="_blank">
+            <button style="margin-right: 10px">Invite To Your Server →</button>
+          </a>
+          <a href="https://top.gg/bot/1225490759432798320" target="_blank">
+            <button style="background-color: #4a4a4a">Features & Voting Rewards</button>
+          </a>
+        </div>
+      </div>
+      <div id="server-logos">
+        <div id="line-1">
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/241734546897240065/e9bd9e33149ad32b2a4807b60a5972db.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/272225752634884097/3e05a9b59f45e1f8d46e2c312cbbf092.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/425459371301011467/57b5e50b8c82b2e28c463366af5ace4f.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/439897975704125442/adfd7df67e8d267d1b7bfa632b5053b0.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/447251816720236555/19acc4381d2409a5af994d09302572c7.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/480603918490009610/a_23ff36c6f81677c0fb712acacb519e46.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/492476764120023040/02e11d71c6115ff554f8acd97976b7df.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/580367415184195584/a_656e6fa11cb06bbb2cfe2b95daa25dc1.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/670955294897209354/7fd93986fe863d9646c02c2668cfe00c.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/700701341105782850/8c32986af11a369ab60121e01db52cbc.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/716082300802170971/8f096da488bc64ca6ffa7d69bee04bdb.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/733979275874664449/a_c76ca80911c277faf4b9e02770bdb219.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/734819361768079370/a_c3207195b4530cccfb563eba07c3cf56.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/741608866474754079/a_841b8a336d026b1e15916d09c739dbc9.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/743856922540900486/81d640084852bb2a60160e48308a8a2e.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/754371944404746333/d907fb933d297cad35fc6746804655b6.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/754655601073586208/ba82e2ccf5cee5a405d4363a7099678c.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/756581925753192578/17a3ef403dbaeaaa831c4d394877be9f.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/757288057446858793/df6ed2b628a91d732dedc91360ca4439.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo">
+            <img
+              src="https://cdn.discordapp.com/icons/764078029575684096/a_b057e8dae00c011053dde46f2fe2bf6d.webp?size=256"
+              alt="" />
+          </div>
+        </div>
+        <div id="line-2">
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/779716165203001374/a_460e904bedd198d916523aba4df1dcee.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/779959545065635850/b53572a31052c3d845b1efe6154bfe57.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/789523790706376744/bf5d905cc4fb9ae85958381da8812d77.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/793206310802817024/a_d9994629f7a775a7dbb6a3253f7f5789.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/801091930456850453/77524d736e356bbb3804353ec680b455.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/807248745094709280/bd91f14570eb11829dbeadc32c2866bf.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/820711658896097290/eafb47b88b8e01066597a68b4f5723ab.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/822237779882147841/bbad95ee97302ab1b34602f378e1d6a8.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/828589951121489971/8bd35c0a3c91f9b52b2e31ffb00957ff.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/828903379362512928/a_7cc37869d71e82aed03706923269cc26.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/829361197442007110/a_1d2aa1cd9a3873b6f738e196997d6f63.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/856529466426916875/a_c2905c85bfc4af1d8d62ac598378f773.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/862048079817342976/eb0ece7e76840a392ec5098151dfc8e9.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/871654537579073556/2faeaab49a58c53c8d7e08711bbf441f.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/881229040437047297/a_4fe13a4e80f90f3f2af9b9c1fb17474f.webp?size=256"
+              alt="" />
+          </div>
+
+          <div class="logo-2">
+            <img
+              src="https://cdn.discordapp.com/icons/884752164164100106/6135e8ea75aa5a6cf50e82db91ce3a4d.webp?size=256"
+              alt="" />
+          </div>
         </div>
       </div>
     </div>
