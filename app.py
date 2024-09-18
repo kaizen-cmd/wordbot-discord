@@ -41,6 +41,8 @@ class App:
             name="activate", description="start the word chain game in this channel"
         )
         async def activate(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
             if not interaction.user.guild_permissions.administrator:
                 await interaction.response.send_message(
                     "Ask a server admin to run this command"
@@ -62,6 +64,8 @@ class App:
             description="reset the word chain game and set all scores to zero",
         )
         async def deactivate(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
             if not interaction.user.guild_permissions.administrator:
                 await interaction.response.send_message(
                     "Ask a server admin to run this command"
@@ -84,6 +88,8 @@ class App:
             name="global_leaderboard", description="get global leaders in wordchain"
         )
         async def global_leaderboard(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
             with open("global_ranks.txt", "r+") as f:
                 lines = f.readlines()
                 if len(
@@ -138,6 +144,8 @@ class App:
             description="vote on top.gg to get double coins 💰 for next 5 words",
         )
         async def send_vote_link(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
             await interaction.response.send_message(
                 "Vote on https://top.gg/bot/1225490759432798320 to get double coins 💰 on next 5 accepted words"
             )
@@ -146,8 +154,10 @@ class App:
             name="help",
             description="get help for the bot",
         )
-        async def help(intereaction: discord.Interaction):
-            await intereaction.response.send_message(
+        async def help(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
+            await interaction.response.send_message(
                 "Wordchain Rules\n"
                 "**1**. Check the previous accepted word.\n"
                 "**2**. Using the last letter of that write a new word.\n"
@@ -180,6 +190,8 @@ class App:
             description="exhaust words starting with the given letter -> choices <a-z>",
         )
         async def exhaust_letter(interaction: discord.Interaction, letter: str):
+            if interaction.user.bot:
+                return
             new_letter = self.CLIENT._exhaust_words_beginning_with(
                 letter, interaction.guild_id
             )
@@ -191,6 +203,8 @@ class App:
             name="score", description="get score of the mentioned user"
         )
         async def score(interaction: discord.Interaction, user: discord.User | None):
+            if interaction.user.bot:
+                return
             if not user:
                 user = interaction.user
             message = self.CLIENT._send_user_score(user, interaction.guild)
@@ -204,6 +218,8 @@ class App:
             description="get leaderboard for the current server",
         )
         async def server_leaderboard(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
             await interaction.response.defer(thinking=True)
             message = await self.CLIENT._construct_and_send_leader_board(
                 interaction.guild
@@ -218,6 +234,8 @@ class App:
             description="get meaning of the word",
         )
         async def meaning(interaction: discord.Interaction, word: str):
+            if interaction.user.bot:
+                return
             message = self.CLIENT._send_meaning(word)
             if type(message) == str:
                 await interaction.response.send_message(message)
@@ -228,6 +246,8 @@ class App:
             name="shop", description="Check out the gamingrefree shop"
         )
         async def shop(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
             await interaction.response.send_message("Launching SOON!")
 
     def run(self):

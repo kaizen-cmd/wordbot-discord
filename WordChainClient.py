@@ -38,6 +38,9 @@ class WordChainClient(commands.AutoShardedBot):
 
     async def on_message(self, message: discord.message.Message):
 
+        if message.author.bot:
+            return
+
         try:
             author = message.author
             if author.id == self.user.id:
@@ -72,7 +75,7 @@ class WordChainClient(commands.AutoShardedBot):
                 coroutines.append(message.reply(string_message))
         except Exception as e:
             logger.error(
-                f"MESSAGE PROCESSING: {message.content} == {e} == {message.guild.name}"
+                f"MESSAGE PROCESSING ERROR: {message.content} == {e} == {message.guild.name}"
             )
 
         await asyncio.gather(*coroutines)
