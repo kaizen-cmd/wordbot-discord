@@ -92,7 +92,7 @@ class WordChainClient(commands.AutoShardedBot):
             ),
         )
         await self.get_channel(WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID).send(
-            f"Server {server.name} kicked the bot"
+            f"Server {server.name} | {server.member_count} kicked the bot"
         )
 
     async def on_guild_join(self, server: discord.Guild):
