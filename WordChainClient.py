@@ -75,7 +75,7 @@ class WordChainClient(commands.AutoShardedBot):
                 coroutines.append(message.reply(string_message))
         except Exception as e:
             logger.error(
-                f"MESSAGE PROCESSING ERROR: {message.content} == {e} == {message.guild.name}"
+                f"[WORD PLAY ERROR]: {message.content} == {e} == {message.guild.name}"
             )
 
         await asyncio.gather(*coroutines)
@@ -149,7 +149,7 @@ class WordChainClient(commands.AutoShardedBot):
                     embed.set_thumbnail(url=user.avatar.url)
             except:
                 logger.error(
-                    f"Error in setting leaderboard thumbnail for user {user.global_name}"
+                    f"[SERVER LEADERBOARD COMMAND] Error in setting leaderboard thumbnail for user {user.global_name}"
                 )
             embed.add_field(
                 value=f"#{rank}.        {user.mention}         {score} coins 💰",

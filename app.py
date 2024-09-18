@@ -109,7 +109,7 @@ class App:
                                     ranks.append((id, score))
                         except:
                             logger.error(
-                                f"Error in getting leaderboard for {server_id}"
+                                f"[GLOBAL LEADERBOARD COMMAND] Error in getting leaderboard for {server_id}"
                             )
                     ranks.sort(key=lambda x: x[1], reverse=True)
 
