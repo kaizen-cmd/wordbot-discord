@@ -59,11 +59,6 @@ def send_embed_to_server(message="Hello World!", server_id="1234116258186657872"
 
 
 def broadcast(message="Hello!"):
-    logging.basicConfig(
-        filename="broadcast.log",
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
     logger = logging.getLogger("broadcast_message_log")
     global server_channel_mapping
     global headers
