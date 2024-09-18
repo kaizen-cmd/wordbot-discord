@@ -59,7 +59,6 @@ class WordChainClient(commands.AutoShardedBot):
 
             coroutines = list()
             if result:
-                coroutines.append(message.add_reaction("✅"))
                 coroutines.append(message.add_reaction("💰"))
                 if len(string_message) == 1:
                     coroutines.append(
