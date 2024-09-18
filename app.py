@@ -15,7 +15,7 @@ load_dotenv(".env")
 
 logging.basicConfig(
     filename="app.log",
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
