@@ -1,0 +1,13 @@
+<div id="logs"></div>
+<script>
+  let ws = new WebSocket("http://localhost:8000/stream-logs");
+  ws.onmessage = (ev) => {
+    let logsDiv = document.getElementById("logs");
+    if (logsDiv.childElementCount > 20) {
+      logsDiv.removeChild(logsDiv.getElementsByTagName("p")[0]);
+    }
+    let pElem = document.createElement("p");
+    pElem.innerText = ev.data;
+    logsDiv.appendChild(pElem);
+  };
+</script>

@@ -5,8 +5,14 @@ import os
 import discord
 import sqlite3
 from collections import namedtuple
-
-from flask import Flask, redirect, render_template, request, session
+from fastapi import FastAPI, Request, Form, WebSocketDisconnect
+from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.requests import Request
+from fastapi.staticfiles import StaticFiles
+from fastapi import WebSocket
+import asyncio
 
 from scripts.get_bot_guilds import get_bot_guilds
 from scripts.send_custom_message import (
@@ -24,12 +30,20 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "1qaz2wsx3edc4rfv"
+app = FastAPI()
+
+# Add session middleware for managing sessions
+app.add_middleware(SessionMiddleware, secret_key="1qaz2wsx3edc4rfv")
+
+# Set up templates
+templates = Jinja2Templates(directory="templates")
+
+# mount static files
+app.mount("/static/", StaticFiles(directory="static"), name="static")
 
 
-@app.route("/vote-callback", methods=["POST"])
-def vote_callback():
+@app.post("/vote-callback")
+async def vote_callback(request: Request):
     logger.info("hello world")
     word_count = 5
 
@@ -38,7 +52,7 @@ def vote_callback():
         return "Hello World"
 
     # Fetch the data from the request
-    data = request.get_json()
+    data = await request.json()
     user_id = int(data["user"])
     type_ = data["type"]
     bot = data["bot"]
@@ -90,19 +104,21 @@ def vote_callback():
     return "Success"
 
 
-@app.route("/", methods=["GET"])
-def home():
-    return render_template("home.html")
+@app.get("/")
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
 
 
-@app.route("/admin", methods=["GET", "POST"])
-def admin():
-    if request.method == "GET":
-        if not session.get("authenticated") == True:
-            return render_template("login.html")
-        servers = get_bot_guilds()
-        active_members = 0
-        server_active_users_map = dict()
+@app.get("/admin")
+async def admin_get(request: Request):
+    if not request.session.get("authenticated"):
+        return templates.TemplateResponse("login.html", {"request": request})
+
+    servers = get_bot_guilds()
+    active_members = 0
+    server_active_users_map = dict()
+
+    try:
         with open("active_members.txt", "+r") as f:
             last_time = datetime.datetime.strptime(
                 f.readline().strip(), "%d/%m/%Y, %H:%M:%S"
@@ -142,53 +158,63 @@ def admin():
                         server_active_users_map.items()
                     ):
                         f2.write(f"{server_id} {member_count}\n")
+    except FileNotFoundError:
+        pass
 
-        for server in servers:
-            server["active_members"] = server_active_users_map.get(
-                str(server["id"]), "DataNA"
-            )
-
-        return render_template(
-            "admin.html", servers=servers, active_members=active_members
+    for server in servers:
+        server["active_members"] = server_active_users_map.get(
+            str(server["id"]), "DataNA"
         )
-    elif request.method == "POST":
-        data = request.form
-        username = data.get("username")
-        password = data.get("password")
-        if username == "slav" and password == "Konnichiwa@11Hajimimashte@11":
-            session["authenticated"] = True
-        return redirect("/admin")
+
+    return templates.TemplateResponse(
+        "admin.html",
+        {"request": request, "servers": servers, "active_members": active_members},
+    )
 
 
-@app.route("/send_message", methods=["POST"])
-def send_message():
-    if session.get("authenticated") != True:
-        return redirect("/admin")
-    data = request.form
-    send_to_server(data.get("message"), data.get("server_id"))
-    return redirect("/admin")
+@app.post("/admin")
+async def admin_post(
+    request: Request, username: str = Form(...), password: str = Form(...)
+):
+    if username == "slav" and password == "Konnichiwa@11Hajimimashte@11":
+        request.session["authenticated"] = True
+    return RedirectResponse("/admin", status_code=303)
 
 
-@app.route("/broadcast", methods=["POST"])
-def broadcast_message():
-    if session.get("authenticated") != True:
-        return redirect("/admin")
-    data = request.form
-    message = data.get("broadcast_message")
-    multiprocessing.Process(target=broadcast, args=(message,), daemon=False).start()
-    return redirect("/admin")
+@app.post("/send_message")
+async def send_message(
+    request: Request, message: str = Form(...), server_id: str = Form(...)
+):
+    if request.session.get("authenticated") != True:
+        return RedirectResponse("/admin", status_code=303)
+    send_to_server(message, server_id)
+    return RedirectResponse("/admin", status_code=303)
 
 
-@app.route("/broadcast-embed", methods=["POST"])
-def broadcast_embed_():
-    if session.get("authenticated") != True:
-        return redirect("/admin")
-    data = request.form
+@app.post("/broadcast")
+async def broadcast_message(request: Request, broadcast_message: str = Form(...)):
+    if request.session.get("authenticated") != True:
+        return RedirectResponse("/admin", status_code=303)
+    multiprocessing.Process(
+        target=broadcast, args=(broadcast_message,), daemon=False
+    ).start()
+    return RedirectResponse("/admin", status_code=303)
+
+
+@app.post("/broadcast-embed")
+async def broadcast_embed_(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    image: str = Form(None),
+):
+    if request.session.get("authenticated") != True:
+        return RedirectResponse("/admin", status_code=303)
 
     embed = discord.Embed(
-        title=data.get("title"),
+        title=title,
         url="https://gamingrefree.online",
-        description=data.get("description"),
+        description=description,
         colour=0x1EEB36,
     )
 
@@ -197,8 +223,8 @@ def broadcast_embed_():
         url="https://gamingrefree.online",
         icon_url="https://i.imgur.com/O5rRjUu.png",
     )
-    if data.get("image"):
-        embed.set_image(url=data.get("image"))
+    if image:
+        embed.set_image(url=image)
 
     embed.set_footer(
         text="Made by GamingRefree Inc.", icon_url="https://i.imgur.com/O5rRjUu.png"
@@ -207,20 +233,24 @@ def broadcast_embed_():
     multiprocessing.Process(
         target=broadcast_embed, args=(embed.to_dict(),), daemon=False
     ).start()
+    return RedirectResponse("/admin", status_code=303)
 
-    return redirect("/admin")
 
+@app.post("/unicast-embed")
+async def unicast_embed(
+    request: Request,
+    title: str = Form(...),
+    description: str = Form(...),
+    server_id: str = Form(...),
+    image: str = Form(None),
+):
+    if request.session.get("authenticated") != True:
+        return RedirectResponse("/admin", status_code=303)
 
-@app.route("/unicast-embed", methods=["POST"])
-def unicast_embed():
-    if session.get("authenticated") != True:
-        return redirect("/admin")
-    data = request.form
-    server_id = data.get("server_id")
     embed = discord.Embed(
-        title=data.get("title"),
+        title=title,
         url="https://gamingrefree.online",
-        description=data.get("description"),
+        description=description,
         colour=0x1EEB36,
     )
 
@@ -229,17 +259,37 @@ def unicast_embed():
         url="https://gamingrefree.online",
         icon_url="https://i.imgur.com/O5rRjUu.png",
     )
-    if data.get("image"):
-        embed.set_image(url=data.get("image"))
+    if image:
+        embed.set_image(url=image)
 
     embed.set_footer(
         text="Made by GamingRefree Inc.", icon_url="https://i.imgur.com/O5rRjUu.png"
     )
 
     send_embed_to_server(embed.to_dict(), server_id)
+    return RedirectResponse("/admin", status_code=303)
 
-    return redirect("/admin")
+
+@app.get("/logs")
+def logs(request: Request):
+    if request.session.get("authenticated") != True:
+        return RedirectResponse("/admin", status_code=303)
+    return templates.TemplateResponse("log.html", {"request": request})
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000, host="127.0.0.1")
+@app.websocket("/stream-logs")
+async def stream_logs(websocket: WebSocket):
+    await websocket.accept()
+    f = open("app.log")
+    try:
+        while True:
+            lines = f.readlines()
+            if not lines:
+                await asyncio.sleep(1)
+                continue
+            for line in lines:
+                await websocket.send_text(line)
+    except WebSocketDisconnect:
+        print("Disconnected client")
+    finally:
+        f.close()

@@ -6,6 +6,7 @@ After=network.target
 User=ubuntu
 WorkingDirectory=/home/ubuntu/wordbot-discord
 ExecStart=/home/ubuntu/wordbot-discord/venv/bin/python3 /home/ubuntu/wordbot-discord/web.py
+ExecStart=/home/ubuntu/wordbot-discord/venv/bin/uvicorn web:app --host 127.0.0.1 --port 5000
 Restart=always
 Environment="BOT_TOKEN=MTIyNTQ5MDc1OTQzMjc5ODMyMA.GBK0hM.7cIV6gluTopYAOsmtbYD0hkvmgChVAeYTWJDdg"
 Environment="SLAV_USER_ID=462682564281499659"
