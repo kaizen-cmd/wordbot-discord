@@ -1,6 +1,6 @@
 <div id="logs"></div>
 <script>
-  let ws = new WebSocket("http://localhost:8000/stream-logs");
+  let ws = new WebSocket("wss://gamingrefree.online/stream-logs");
   ws.onmessage = (ev) => {
     let logsDiv = document.getElementById("logs");
     if (logsDiv.childElementCount > 20) {
