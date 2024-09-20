@@ -192,6 +192,11 @@ class App:
         async def exhaust_letter(interaction: discord.Interaction, letter: str):
             if interaction.user.bot:
                 return
+            if not interaction.user.guild_permissions.administrator:
+                await interaction.response.send_message(
+                    "Ask a server admin to run this command"
+                )
+                return
             new_letter = self.CLIENT._exhaust_words_beginning_with(
                 letter, interaction.guild_id
             )
