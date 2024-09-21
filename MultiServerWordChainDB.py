@@ -38,9 +38,6 @@ class MultiServerWordChainDB:
     def get_words_table_name(self, server_id):
         return f"words_{server_id}"
 
-    def get_last_char_user_table_name(self, server_id):
-        return f"lcu_{server_id}"
-
     def is_server_onboard(self, server_id):
         user_table = self.get_users_table_name(server_id)
         status = self.curr.execute(
@@ -52,7 +49,6 @@ class MultiServerWordChainDB:
 
         user_table = self.get_users_table_name(server_id)
         word_table = self.get_words_table_name(server_id)
-        last_char_user_table = self.get_last_char_user_table_name(server_id)
 
         self.curr.execute(
             f"CREATE TABLE IF NOT EXISTS {word_table}(word text primary key, isUsed integer default 0)"
@@ -62,14 +58,11 @@ class MultiServerWordChainDB:
         )
 
         self.curr.execute(
-            f"CREATE TABLE IF NOT EXISTS {last_char_user_table}(last_char varchar(1) default '', last_user_id integer default 0, id integer default 1 primary key)"
+            f"INSERT INTO lu(last_char, last_user_id, server_id) VALUES('', 0, '{server_id}')"
         )
-        self.curr.execute(f"INSERT INTO {last_char_user_table} (id) values(1)")
         self.conn.commit()
 
-        self.server_table_mapping[server_id].append(
-            (user_table, word_table, last_char_user_table)
-        )
+        self.server_table_mapping[server_id].append((user_table, word_table))
 
         with open("words_alpha.txt", "r") as f:
             words = list()
@@ -85,11 +78,10 @@ class MultiServerWordChainDB:
     def deboard_server(self, server_id):
         user_table = self.get_users_table_name(server_id)
         word_table = self.get_words_table_name(server_id)
-        last_char_user_table = self.get_last_char_user_table_name(server_id)
 
         self.curr.execute(f"DROP TABLE {word_table}")
         self.curr.execute(f"DROP TABLE {user_table}")
-        self.curr.execute(f"DROP TABLE {last_char_user_table}")
+        self.curr.execute(f"DELETE FROM lu WHERE server_id='{server_id}'")
         self.conn.commit()
         logger.info(f"De boarded server {server_id}")
 
@@ -97,7 +89,6 @@ class MultiServerWordChainDB:
 
         user_table = self.get_users_table_name(server_id)
         word_table = self.get_words_table_name(server_id)
-        last_char_user_table = self.get_last_char_user_table_name(server_id)
 
         user_score = self.curr.execute(
             f"SELECT score FROM {user_table} WHERE id=?", (player_id,)
@@ -115,7 +106,7 @@ class MultiServerWordChainDB:
             user_score = user_score[0]
 
         last_char, last_user_id = self.curr.execute(
-            f"SELECT last_char, last_user_id FROM {last_char_user_table} WHERE id=1"
+            f"SELECT last_char, last_user_id FROM lu WHERE server_id='{server_id}'"
         ).fetchone()
 
         if player_id == last_user_id:
@@ -179,7 +170,7 @@ class MultiServerWordChainDB:
         )
         self.curr.execute(f"UPDATE {word_table} SET isUsed=1 WHERE word=?", (word,))
         self.curr.execute(
-            f"UPDATE {last_char_user_table} SET last_user_id=?, last_char=? WHERE id=1",
+            f"UPDATE lu SET last_user_id=?, last_char=? WHERE server_id={server_id}",
             (player_id, word[-1]),
         )
         self.conn.commit()
@@ -239,7 +230,6 @@ class MultiServerWordChainDB:
     def _change_letter(self, server_id):
 
         word_table = self.get_words_table_name(server_id)
-        last_char_user_table = self.get_last_char_user_table_name(server_id)
 
         random.shuffle(self.char_list)
         for i in self.char_list:
@@ -248,7 +238,7 @@ class MultiServerWordChainDB:
             ).fetchone()
             if next_word_exists:
                 self.curr.execute(
-                    f"UPDATE {last_char_user_table} SET last_char=? WHERE id=1",
+                    f"UPDATE lu SET last_char=? WHERE server_id='{server_id}'",
                     (i),
                 )
                 self.conn.commit()
