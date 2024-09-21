@@ -180,7 +180,7 @@ class WordChainClient(commands.AutoShardedBot):
         coroutines = list()
         for user_row in data:
             rank, id, score = user_row
-            coroutines.append(await self.fetch_user(id))
+            coroutines.append(self.fetch_user(id))
         users = await asyncio.gather(*coroutines)
         for user, user_row in zip(users, data):
             rank, id, score = user_row
