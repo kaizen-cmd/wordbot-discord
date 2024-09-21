@@ -1,6 +1,6 @@
 import os
-import requests
 
+import requests
 
 headers = {"Authorization": f"Bot {os.getenv('BOT_TOKEN')}"}
 url = "https://discord.com/api/v10/users/@me/guilds?with_counts=true"

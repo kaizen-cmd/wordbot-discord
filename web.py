@@ -1,26 +1,22 @@
-import datetime
+import asyncio
 import logging
 import multiprocessing
 import os
-import discord
 import sqlite3
 from collections import namedtuple
-from fastapi import FastAPI, Request, Form, WebSocketDisconnect
+
+import discord
+from fastapi import FastAPI, Form, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
-from fastapi.staticfiles import StaticFiles
-from fastapi import WebSocket
-import asyncio
 
+from elements import GamingRefreeEmbed
 from scripts.get_bot_guilds import get_bot_guilds
-from scripts.send_custom_message import (
-    broadcast,
-    send_to_server,
-    broadcast_embed,
-    send_embed_to_server,
-)
+from scripts.send_custom_message import (broadcast, broadcast_embed,
+                                         send_embed_to_server, send_to_server)
 from scripts.send_dm import create_dm_channel, send_dm
 
 logging.basicConfig(
@@ -179,24 +175,10 @@ async def broadcast_embed_(
 ):
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
-
-    embed = discord.Embed(
+    embed = GamingRefreeEmbed(
         title=title,
-        url="https://gamingrefree.online",
         description=description,
-        colour=0x1EEB36,
-    )
-
-    embed.set_author(
-        name="GamingRefree",
-        url="https://gamingrefree.online",
-        icon_url="https://i.imgur.com/O5rRjUu.png",
-    )
-    if image:
-        embed.set_image(url=image)
-
-    embed.set_footer(
-        text="Made by GamingRefree Inc.", icon_url="https://i.imgur.com/O5rRjUu.png"
+        image_url=image if image else None,
     )
 
     multiprocessing.Process(
@@ -216,23 +198,10 @@ async def unicast_embed(
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
 
-    embed = discord.Embed(
+    embed = GamingRefreeEmbed(
         title=title,
-        url="https://gamingrefree.online",
         description=description,
-        colour=0x1EEB36,
-    )
-
-    embed.set_author(
-        name="GamingRefree",
-        url="https://gamingrefree.online",
-        icon_url="https://i.imgur.com/O5rRjUu.png",
-    )
-    if image:
-        embed.set_image(url=image)
-
-    embed.set_footer(
-        text="Made by GamingRefree Inc.", icon_url="https://i.imgur.com/O5rRjUu.png"
+        image_url=image if image else None,
     )
 
     send_embed_to_server(embed.to_dict(), server_id)

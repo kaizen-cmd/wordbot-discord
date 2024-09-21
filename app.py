@@ -1,11 +1,10 @@
-import datetime
 import logging
 import os
 
 import discord
 from dotenv import load_dotenv
 
-from buttons import VoteButton
+from elements import VoteButton
 from WordChainClient import WordChainClient
 
 if ".env" not in os.listdir():
@@ -115,33 +114,8 @@ class App:
         async def help(interaction: discord.Interaction):
             if interaction.user.bot:
                 return
-            await interaction.response.send_message(
-                "Wordchain Rules\n"
-                "**1**. Check the previous accepted word.\n"
-                "**2**. Using the last letter of that write a new word.\n"
-                "**3**. NO CONSECUTIVE TURNS ALLOWED.\n"
-                "**4**. 7 or more characters in the word = 6 coins 💰.\n"
-                "**5**. 6 or lesser characters in the word = 4 coins 💰.\n"
-                "**6**. Same starting and ending letter = Additional 2 coins 💰.\n"
-                "**7**. Out of turn, wrong word in the chain = **2 coins 💰 will be deducted**.\n"
-                "**8**. Word length has to be greater than 3.\n\n"
-                "**User Commands**\n"
-                "```\n"
-                "/help - Get help for wordchain bot\n"
-                "/score <username> - Get score of the user\n"
-                "/server_leaderboard - Get server rankings\n"
-                "/global_leaderboard - Get global rankings\n"
-                "/meaning <word>\n"
-                "/vote - Get double coins 💰 for next 5 words\n"
-                "```\n"
-                "**Admin Commands**\n"
-                "```\n"
-                "/activate - start the game in this channel\n"
-                "/deactivate - reset the scores to zero and deactivate\n"
-                "/exhaust <letter> - End words beginning with <letter>\n"
-                "```\n"
-                "Join support server for bugs, suggestions"
-            )
+            embed = self.CLIENT.get_help_embed()
+            await interaction.response.send_message(embed=embed, view=VoteButton())
 
         @self.CLIENT.tree.command(
             name="exhaust",

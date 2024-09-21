@@ -8,6 +8,7 @@ import discord
 import requests
 from discord.ext import commands
 
+from elements import GamingRefreeEmbed
 from MultiServerWordChainDB import MultiServerWordChainDB
 
 logger = logging.getLogger(__name__)
@@ -140,11 +141,9 @@ class WordChainClient(commands.AutoShardedBot):
         result, data = self.db.leaderboard(server_id=server.id)
         if not result:
             return data
-
-        embed = discord.Embed()
-        embed.title = f"Global leaderboard (Realtime)"
-        embed.colour = discord.Color.purple()
-
+        embed = GamingRefreeEmbed(
+            title=f"{server.name} Leaderboard",
+        )
         coroutines = list()
         for user_row in data:
             rank, id, score = user_row
@@ -165,7 +164,6 @@ class WordChainClient(commands.AutoShardedBot):
                 inline=False,
             )
 
-        embed.set_footer(text=f"Made by GamingRefree Inc.")
         return embed
 
     async def _construct_and_send_global_leader_board(self):
@@ -173,9 +171,7 @@ class WordChainClient(commands.AutoShardedBot):
         if not result:
             return data
 
-        embed = discord.Embed()
-        embed.title = f"Global leaderboard (Realtime)"
-        embed.colour = discord.Color.purple()
+        embed = GamingRefreeEmbed(title=f"Global leaderboard (Realtime)")
 
         coroutines = list()
         for user_row in data:
@@ -197,7 +193,6 @@ class WordChainClient(commands.AutoShardedBot):
                 inline=False,
             )
 
-        embed.set_footer(text=f"Made by GamingRefree Inc.")
         return embed
 
     def _send_user_score(self, author: discord.User, server: discord.Guild):
@@ -205,15 +200,13 @@ class WordChainClient(commands.AutoShardedBot):
         if not result:
             return data
         id, score, rank = data
-        embed = discord.Embed(title=f"{author.global_name}'s score")
+        embed = GamingRefreeEmbed(title=f"{author.global_name}'s score")
         embed.add_field(
             value=f"Rank {rank}.    @{author.global_name}    {score} coins 💰",
             name="",
             inline=False,
         )
         embed.set_thumbnail(url=author.avatar.url)
-        embed.set_footer(text=f"Made by GamingRefree Inc.")
-        embed.colour = discord.Color.dark_teal()
         return embed
 
     def _send_meaning(self, word: str):
@@ -228,45 +221,43 @@ class WordChainClient(commands.AutoShardedBot):
                 meaning = response.json()[0]["meanings"][0]["definitions"][0][
                     "definition"
                 ]
-                embed = discord.Embed(title=f"Meaning of the word {word}")
+                embed = GamingRefreeEmbed(title=f"Meaning of the word {word}")
                 embed.add_field(name=word, value=meaning)
-                embed.colour = discord.Color.dark_blue()
-                embed.set_footer(text=f"Made by GamingRefree Inc.")
                 return embed
             except:
                 return f"The language expert is not avaialable at the moment"
         return "Invalid word"
 
-    async def _send_help(self, message: discord.Message):
-        await message.reply(
+    def get_help_embed(self):
+        embed = GamingRefreeEmbed()
+        embed.description = (
             "Wordchain Rules\n"
-            "**1**. Check the previous accepted word.\n"
-            "**2**. Using the last letter of that write a new word.\n"
-            "**3**. NO CONSECUTIVE TURNS ALLOWED.\n"
-            "**4**. 7 or more characters in the word = 6 coins 💰.\n"
-            "**5**. 6 or lesser characters in the word = 4 coins 💰.\n"
-            "**6**. Same starting and ending letter = Additional 2 coins 💰.\n"
-            "**7**. Out of turn, wrong word in the chain = **2 coins 💰 will be deducted**.\n"
-            "**8**. Word length has to be greater than 3.\n\n"
+            "- Check the previous accepted word.\n"
+            "- Using the last letter of that write a new word.\n"
+            "- NO CONSECUTIVE TURNS ALLOWED.\n"
+            "- 7 or more characters in the word = 6 coins 💰.\n"
+            "- 6 or lesser characters in the word = 4 coins 💰.\n"
+            "- Same starting and ending letter = Additional 2 coins 💰.\n"
+            "- Out of turn, wrong word in the chain = **2 coins 💰 will be deducted**.\n"
+            "- Word length has to be greater than 3.\n\n"
             "**User Commands**\n"
             "```\n"
-            "@GamingRefree myscore\n"
-            "@GamingRefree score\n"
-            "@GamingRefree meaning <word>\n"
-            "```\n"
-            "**Slash Commands**\n"
-            "```\n"
-            "/vote - Get double coins 💰 for next 5 words\n"
+            "/help - Get help for wordchain bot\n"
+            "/score <username> - Get score of the user\n"
+            "/server_leaderboard - Get server rankings\n"
             "/global_leaderboard - Get global rankings\n"
+            "/meaning <word>\n"
+            "/vote - Get double coins 💰 for next 5 words\n"
             "```\n"
             "**Admin Commands**\n"
             "```\n"
-            "@GamingRefree activate\n"
-            "@GamingRefree deactivate\n"
-            "@GamingRefree exhaust <letter> - End words beginning with <letter>\n"
+            "/activate - start the game in this channel\n"
+            "/deactivate - reset the scores to zero and deactivate\n"
+            "/exhaust <letter> - End words beginning with <letter>\n"
             "```\n"
             "Join support server for bugs, suggestions"
         )
+        return embed
 
     def _validate_message(self, content: str):
         words = content.lower().split(" ")
