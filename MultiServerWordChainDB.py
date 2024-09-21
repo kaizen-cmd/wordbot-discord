@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 class MultiServerWordChainDB:
 
     def __init__(self):
-        self.server_table_mapping = defaultdict(list)
         self.conn = sqlite3.connect("db.sqlite3")
         self.curr = self.conn.cursor()
         self.negative_marks = 2
@@ -17,52 +16,37 @@ class MultiServerWordChainDB:
         self.marks_for_word_length_lte_seven = 4
         self.marks_for_same_start_end_word = 2
         self.char_list = list("abcdefghijklmnopqrstuvwxyz")
-
-        # Populate server_table_mapping with existing tables in the database
-        self.curr.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        existing_tables = self.curr.fetchall()
-        for table_name in existing_tables:
-            table_name = table_name[0]  # Extract table name from tuple
-            server_id = "_".join(table_name.split("_")[0:-1])
-            self.server_table_mapping[server_id].append(table_name)
-
         self._create_voting_record_table()
 
     def __del__(self):
         self.curr.close()
         self.conn.close()
 
-    def get_users_table_name(self, server_id):
-        return f"users_{server_id}"
-
     def get_words_table_name(self, server_id):
         return f"words_{server_id}"
 
     def is_server_onboard(self, server_id):
-        user_table = self.get_users_table_name(server_id)
+        word_table = self.get_words_table_name(server_id)
         status = self.curr.execute(
-            f"SELECT name FROM sqlite_master WHERE type='table' AND name='{user_table}'"
+            f"SELECT name FROM sqlite_master WHERE type='table' AND name='{word_table}'"
         ).fetchone()
         return bool(status)
 
     def onboard_server(self, server_id):
 
-        user_table = self.get_users_table_name(server_id)
         word_table = self.get_words_table_name(server_id)
 
         self.curr.execute(
             f"CREATE TABLE IF NOT EXISTS {word_table}(word text primary key, isUsed integer default 0)"
         )
         self.curr.execute(
-            f"CREATE TABLE IF NOT EXISTS {user_table}(id integer primary key, score integer default 0)"
+            f"CREATE TABLE IF NOT EXISTS users(id integer primary key, user_id varchar(255), score integer default 0, server_id varchar(255))"
         )
 
         self.curr.execute(
             f"INSERT INTO lu(last_char, last_user_id, server_id) VALUES('', 0, '{server_id}')"
         )
         self.conn.commit()
-
-        self.server_table_mapping[server_id].append((user_table, word_table))
 
         with open("words_alpha.txt", "r") as f:
             words = list()
@@ -76,28 +60,30 @@ class MultiServerWordChainDB:
         logger.info(f"On boarded server {server_id}")
 
     def deboard_server(self, server_id):
-        user_table = self.get_users_table_name(server_id)
         word_table = self.get_words_table_name(server_id)
 
         self.curr.execute(f"DROP TABLE {word_table}")
-        self.curr.execute(f"DROP TABLE {user_table}")
+        self.curr.execute(f"DELETE FROM users WHERE server_id='{server_id}'")
         self.curr.execute(f"DELETE FROM lu WHERE server_id='{server_id}'")
         self.conn.commit()
         logger.info(f"De boarded server {server_id}")
 
     def try_play_word(self, server_id, player_id, word):
 
-        user_table = self.get_users_table_name(server_id)
         word_table = self.get_words_table_name(server_id)
 
         user_score = self.curr.execute(
-            f"SELECT score FROM {user_table} WHERE id=?", (player_id,)
+            f"SELECT score FROM users WHERE user_id=? AND server_id=?",
+            (
+                str(player_id),
+                str(server_id),
+            ),
         ).fetchone()
 
         if not user_score:
             self.curr.execute(
-                f"INSERT INTO {user_table} (id) VALUES (?)",
-                (player_id,),
+                f"INSERT INTO users (user_id, server_id) VALUES (?, ?) ",
+                (str(player_id), str(server_id)),
             )
             self.conn.commit()
             logger.info(f"User added ID: {player_id} Server ID: {server_id}")
@@ -112,7 +98,8 @@ class MultiServerWordChainDB:
         if player_id == last_user_id:
             user_score = max(0, user_score - self.negative_marks)
             self.curr.execute(
-                f"UPDATE {user_table} SET score=? WHERE id=?", (user_score, player_id)
+                f"UPDATE users SET score=? WHERE user_id=? AND server_id=?",
+                (user_score, str(player_id), str(server_id)),
             )
             self.conn.commit()
             return (
@@ -123,7 +110,8 @@ class MultiServerWordChainDB:
         if last_char and word[0] != last_char:
             user_score = max(0, user_score - self.negative_marks)
             self.curr.execute(
-                f"UPDATE {user_table} SET score=? WHERE id=?", (user_score, player_id)
+                f"UPDATE users SET score=? WHERE user_id=? AND server_id=?",
+                (user_score, str(player_id), str(server_id)),
             )
             self.conn.commit()
             return (
@@ -166,11 +154,12 @@ class MultiServerWordChainDB:
             self.conn.commit()
 
         self.curr.execute(
-            f"UPDATE {user_table} SET score=? WHERE id=?", (user_score, player_id)
+            f"UPDATE users SET score=? WHERE user_id=? AND server_id=?",
+            (user_score, str(player_id), str(server_id)),
         )
         self.curr.execute(f"UPDATE {word_table} SET isUsed=1 WHERE word=?", (word,))
         self.curr.execute(
-            f"UPDATE lu SET last_user_id=?, last_char=? WHERE server_id={server_id}",
+            f"UPDATE lu SET last_user_id=?, last_char=? WHERE server_id='{server_id}'",
             (player_id, word[-1]),
         )
         self.conn.commit()
@@ -183,9 +172,8 @@ class MultiServerWordChainDB:
         return (True, "Word accepted")
 
     def get_score(self, server_id, player_id):
-        user_table = self.get_users_table_name(server_id)
 
-        QUERY = f"SELECT id, score, (SELECT COUNT(DISTINCT score) + 1 FROM {user_table} WHERE score > u.score) AS rank FROM {user_table} u WHERE id = {player_id}"
+        QUERY = f"SELECT user_id, score, (SELECT COUNT(DISTINCT score) + 1 FROM users WHERE score > u.score) AS rank FROM users u WHERE user_id = '{player_id}' AND server_id='{server_id}'"
         result = self.curr.execute(QUERY).fetchone()
         if not result:
             return (False, "Ask them to start playing")
@@ -193,8 +181,19 @@ class MultiServerWordChainDB:
         return (True, (id, score, rank))
 
     def leaderboard(self, server_id):
-        user_table = self.get_users_table_name(server_id)
-        QUERY = f"SELECT id, score FROM {user_table} ORDER BY score DESC LIMIT 5"
+        QUERY = f"SELECT user_id, score FROM users WHERE server_id='{server_id}' ORDER BY score DESC LIMIT 5"
+        user_rows = self.curr.execute(QUERY).fetchall()
+        if not user_rows:
+            return (False, "Start playing")
+
+        result = []
+        for rank, user_row in enumerate(user_rows, start=1):
+            id, score = user_row
+            result.append((rank, id, score))
+        return (True, result)
+
+    def get_global_leaderboard(self):
+        QUERY = f"SELECT user_id, score FROM users ORDER BY score DESC LIMIT 5"
         user_rows = self.curr.execute(QUERY).fetchall()
         if not user_rows:
             return (False, "Start playing")

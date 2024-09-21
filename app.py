@@ -90,54 +90,12 @@ class App:
         async def global_leaderboard(interaction: discord.Interaction):
             if interaction.user.bot:
                 return
-            with open("global_ranks.txt", "r+") as f:
-                lines = f.readlines()
-                if len(
-                    lines
-                ) == 0 or datetime.datetime.now() > datetime.datetime.strptime(
-                    lines[0].strip(), "%d/%m/%Y, %H:%M:%S"
-                ) + datetime.timedelta(
-                    hours=4
-                ):
-                    ranks = list()
-                    for server_id in list(self.CLIENT.server_channel_mapping.keys()):
-                        try:
-                            exists, result = self.CLIENT.db.leaderboard(server_id)
-                            if exists:
-                                for rec in result:
-                                    server_rank, id, score = rec
-                                    ranks.append((id, score))
-                        except:
-                            logger.error(
-                                f"[GLOBAL LEADERBOARD COMMAND] Error in getting leaderboard for {server_id}"
-                            )
-                    ranks.sort(key=lambda x: x[1], reverse=True)
-
-                    with open("global_ranks.txt", "w") as f2:
-                        f2.write(datetime.datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
-                        f2.write("\n")
-                        for i in range(min(len(ranks), 5)):
-                            user = await self.CLIENT.fetch_user(ranks[i][0])
-                            f2.write(
-                                f"{user.global_name},{ranks[i][1]},{user.avatar.url}"
-                            )
-                            f2.write("\n")
-            embed = discord.Embed(title="Global leaderboard (Updates every 4 hours)")
-            embed.color = discord.Color.brand_green()
-            with open("global_ranks.txt", "r") as f:
-                lines = f.readlines()
-                rank = 1
-                for i in lines[1:]:
-                    username, points, avatar = i.split(",")
-                    if not embed.thumbnail.url:
-                        embed.set_thumbnail(url=avatar)
-                    embed.add_field(
-                        value=f"#{rank}.    @{username}    {points} coins 💰",
-                        name="",
-                        inline=False,
-                    )
-                    rank += 1
-            await interaction.response.send_message(embed=embed, view=VoteButton())
+            await interaction.response.defer(thinking=True)
+            message = await self.CLIENT._construct_and_send_global_leader_board()
+            if type(message) == str:
+                await interaction.followup.send(message)
+                return
+            await interaction.followup.send(embed=message, view=VoteButton())
 
         @self.CLIENT.tree.command(
             name="vote",
