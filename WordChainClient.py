@@ -126,7 +126,12 @@ class WordChainClient(commands.AutoShardedBot):
             self.db.deboard_server(server_id=server.id)
         except Exception as e:
             pass
-        return "Wordchain resetted and deactivated  ⭕️, `/activate` to reactivate"
+        embed = GamingRefreeEmbed()
+        embed.title = "Game stopped and scores reset"
+        embed.description = (
+            "Wordchain resetted and deactivated  ⭕️, `/activate` to reactivate"
+        )
+        return embed
 
     def _activate_bot(self, server: discord.Guild, channel):
         self.server_channel_mapping[str(server.id)] = channel.id
@@ -135,7 +140,12 @@ class WordChainClient(commands.AutoShardedBot):
         f.close()
         if not self.db.is_server_onboard(server.id):
             self.db.onboard_server(server.id)
-        return "Wordchain activated, type a word ✅ , ```/help``` for rules and support"
+        embed = GamingRefreeEmbed()
+        embed.title = "Game started!"
+        embed.description = (
+            "Wordchain activated, type a word ✅ , `/help` for rules and support"
+        )
+        return embed
 
     async def _construct_and_send_leader_board(self, server: discord.Guild):
         result, data = self.db.leaderboard(server_id=server.id)

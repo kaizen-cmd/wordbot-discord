@@ -48,8 +48,8 @@ class App:
                 )
                 return
 
-            message = self.CLIENT._activate_bot(interaction.guild, interaction.channel)
-            await interaction.response.send_message(message)
+            embed = self.CLIENT._activate_bot(interaction.guild, interaction.channel)
+            await interaction.response.send_message(embed=embed, view=VoteButton())
             if (
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
@@ -71,10 +71,8 @@ class App:
                 )
                 return
 
-            message = self.CLIENT._deactivate_bot(
-                interaction.guild, interaction.channel
-            )
-            await interaction.response.send_message(message)
+            embed = self.CLIENT._deactivate_bot(interaction.guild, interaction.channel)
+            await interaction.response.send_message(embed=embed, view=VoteButton())
             if (
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
