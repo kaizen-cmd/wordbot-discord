@@ -173,7 +173,7 @@ class MultiServerWordChainDB:
 
     def get_score(self, server_id, player_id):
 
-        QUERY = f"SELECT user_id, score, (SELECT COUNT(DISTINCT score) + 1 FROM users WHERE score > u.score) AS rank FROM users u WHERE user_id = '{player_id}' AND server_id='{server_id}'"
+        QUERY = f"SELECT user_id, score, (SELECT COUNT(DISTINCT score) + 1 FROM users WHERE score > u.score AND server_id='{server_id}') AS rank FROM users u WHERE user_id = '{player_id}' AND server_id='{server_id}'"
         result = self.curr.execute(QUERY).fetchone()
         if not result:
             return (False, "Ask them to start playing")
