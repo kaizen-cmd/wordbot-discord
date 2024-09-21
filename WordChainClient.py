@@ -22,7 +22,7 @@ class WordChainClient(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db = MultiServerWordChainDB()
-        self.shard_count = 2
+        # self.shard_count = 2
 
         f = open("server_channel_mapping.json", "r")
         self.server_channel_mapping = json.loads(f.read())
