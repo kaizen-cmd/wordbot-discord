@@ -59,7 +59,6 @@
       width: 50%;
       margin-top: 5%;
       padding-left: 5%;
-      padding-right: 15%;
     }
     #logo img {
       width: 120px;
@@ -75,48 +74,6 @@
       color: rgba(255, 255, 255, 0.667);
       text-align: justify;
     }
-    #server-logos {
-      overflow: hidden;
-      height: 100vh;
-      display: flex;
-      justify-content: space-evenly;
-      width: 40%;
-    }
-    #line-1 {
-      display: flex;
-      flex-direction: column;
-    }
-    .logo {
-      margin: 0 0 20px 0;
-      animation: scroll 25s infinite;
-      animation-timing-function: linear;
-    }
-    .logo-2 {
-      margin: 0 0 20px 0;
-      animation: scroll-2 25s infinite;
-      animation-timing-function: linear;
-    }
-    @keyframes scroll {
-      0% {
-        transform: translateY(0%);
-      }
-      100% {
-        transform: translateY(-1750%);
-      }
-    }
-    @keyframes scroll-2 {
-      0% {
-        transform: translateY(-1750%);
-      }
-      100% {
-        transform: translateY(0%);
-      }
-    }
-    .logo img,
-    .logo-2 img {
-      border-radius: 10px;
-      width: 125px;
-    }
     button {
       background-color: #3e5ece;
       color: white;
@@ -130,6 +87,24 @@
     }
     a {
       text-decoration: none;
+    }
+    #server-info {
+      width: 50%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #server-info img {
+      width: 125px;
+      border-radius: 10px;
+    }
+    .logo-lines {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin: 15px 0;
     }
   </style>
   <body>
@@ -156,226 +131,51 @@
           </a>
         </div>
       </div>
-      <div id="server-logos">
-        <div id="line-1">
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/241734546897240065/e9bd9e33149ad32b2a4807b60a5972db.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/272225752634884097/3e05a9b59f45e1f8d46e2c312cbbf092.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/425459371301011467/57b5e50b8c82b2e28c463366af5ace4f.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/439897975704125442/adfd7df67e8d267d1b7bfa632b5053b0.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/447251816720236555/19acc4381d2409a5af994d09302572c7.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/480603918490009610/a_23ff36c6f81677c0fb712acacb519e46.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/492476764120023040/02e11d71c6115ff554f8acd97976b7df.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/580367415184195584/a_656e6fa11cb06bbb2cfe2b95daa25dc1.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/670955294897209354/7fd93986fe863d9646c02c2668cfe00c.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/700701341105782850/8c32986af11a369ab60121e01db52cbc.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/716082300802170971/8f096da488bc64ca6ffa7d69bee04bdb.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/733979275874664449/a_c76ca80911c277faf4b9e02770bdb219.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/734819361768079370/a_c3207195b4530cccfb563eba07c3cf56.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/741608866474754079/a_841b8a336d026b1e15916d09c739dbc9.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/743856922540900486/81d640084852bb2a60160e48308a8a2e.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/754371944404746333/d907fb933d297cad35fc6746804655b6.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/754655601073586208/ba82e2ccf5cee5a405d4363a7099678c.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/756581925753192578/17a3ef403dbaeaaa831c4d394877be9f.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/757288057446858793/df6ed2b628a91d732dedc91360ca4439.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo">
-            <img
-              src="https://cdn.discordapp.com/icons/764078029575684096/a_b057e8dae00c011053dde46f2fe2bf6d.webp?size=256"
-              alt="" />
-          </div>
+      <div id="server-info">
+        <div id="line-1" class="logo-lines">
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
         </div>
-        <div id="line-2">
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/779716165203001374/a_460e904bedd198d916523aba4df1dcee.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/779959545065635850/b53572a31052c3d845b1efe6154bfe57.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/789523790706376744/bf5d905cc4fb9ae85958381da8812d77.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/793206310802817024/a_d9994629f7a775a7dbb6a3253f7f5789.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/801091930456850453/77524d736e356bbb3804353ec680b455.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/807248745094709280/bd91f14570eb11829dbeadc32c2866bf.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/820711658896097290/eafb47b88b8e01066597a68b4f5723ab.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/822237779882147841/bbad95ee97302ab1b34602f378e1d6a8.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/828589951121489971/8bd35c0a3c91f9b52b2e31ffb00957ff.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/828903379362512928/a_7cc37869d71e82aed03706923269cc26.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/829361197442007110/a_1d2aa1cd9a3873b6f738e196997d6f63.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/856529466426916875/a_c2905c85bfc4af1d8d62ac598378f773.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/862048079817342976/eb0ece7e76840a392ec5098151dfc8e9.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/871654537579073556/2faeaab49a58c53c8d7e08711bbf441f.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/881229040437047297/a_4fe13a4e80f90f3f2af9b9c1fb17474f.webp?size=256"
-              alt="" />
-          </div>
-
-          <div class="logo-2">
-            <img
-              src="https://cdn.discordapp.com/icons/884752164164100106/6135e8ea75aa5a6cf50e82db91ce3a4d.webp?size=256"
-              alt="" />
-          </div>
+        <div id="line-2" class="logo-lines">
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+        </div>
+        <div id="line-3" class="logo-lines">
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+        </div>
+        <div id="line-4" class="logo-lines">
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
+          <div><img src="https://picsum.photos/125" alt="" /></div>
         </div>
       </div>
     </div>
+    <script>
+      let ws = new WebSocket("ws://127.0.0.1:8000/stream-server-info");
+      let logoLineIDs = ["line-1", "line-2", "line-3", "line-4"];
+      let currentLine = 0;
+      let currentImageCount = 1;
+      let imgPos = [1, 3, 5, 7];
+      ws.onmessage = (ev) => {
+        let parsedData = JSON.parse(ev.data);
+        if (!parsedData["icons"]) {
+          return;
+        }
+        let currentLineElem = document.getElementById(logoLineIDs[currentLine]);
+        currentLineElem.childNodes[
+          currentImageCount
+        ].childNodes[0].src = `https://cdn.discordapp.com/icons/${parsedData["id"]}/${parsedData["icons"]}.webp?size=256`;
+        currentImageCount = imgPos[Math.floor(Math.random() * 4)];
+        currentLine = Math.floor(Math.random() * 4);
+      };
+    </script>
   </body>
 </html>

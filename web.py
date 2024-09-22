@@ -5,7 +5,6 @@ import os
 import sqlite3
 from collections import namedtuple
 
-import discord
 from fastapi import FastAPI, Form, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,8 +14,12 @@ from starlette.requests import Request
 
 from elements import GamingRefreeEmbed
 from scripts.get_bot_guilds import get_bot_guilds
-from scripts.send_custom_message import (broadcast, broadcast_embed,
-                                         send_embed_to_server, send_to_server)
+from scripts.send_custom_message import (
+    broadcast,
+    broadcast_embed,
+    send_embed_to_server,
+    send_to_server,
+)
 from scripts.send_dm import create_dm_channel, send_dm
 
 logging.basicConfig(
@@ -103,6 +106,22 @@ async def vote_callback(request: Request):
 @app.get("/")
 async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
+
+
+@app.websocket("/stream-server-info")
+async def stream_server_info(websocket: WebSocket):
+    await websocket.accept()
+    guilds = get_bot_guilds()
+    current_index = 0
+    try:
+        while True:
+            current_index = (current_index + 1) % max(len(guilds), 1)
+            await websocket.send_json(guilds[current_index])
+            await asyncio.sleep(0.5)
+    except WebSocketDisconnect:
+        print("Disconnected client")
+    finally:
+        websocket.close()
 
 
 @app.get("/admin")
@@ -231,3 +250,4 @@ async def stream_logs(websocket: WebSocket):
         print("Disconnected client")
     finally:
         f.close()
+        websocket.close()
