@@ -108,22 +108,6 @@ async def home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
-@app.websocket("/stream-server-info")
-async def stream_server_info(websocket: WebSocket):
-    await websocket.accept()
-    guilds = get_bot_guilds()
-    current_index = 0
-    try:
-        while True:
-            current_index = (current_index + 1) % max(len(guilds), 1)
-            await websocket.send_json(guilds[current_index])
-            await asyncio.sleep(0.5)
-    except WebSocketDisconnect:
-        print("Disconnected client")
-    finally:
-        websocket.close()
-
-
 @app.get("/admin")
 async def admin_get(request: Request):
     if not request.session.get("authenticated"):
