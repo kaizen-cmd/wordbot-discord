@@ -58,8 +58,6 @@ class WordChainClient(commands.AutoShardedBot):
             if self.server_channel_mapping.get(str(server.id)) != channel.id:
                 return
 
-            logger.info(f"[WORD PLAYED] {content}")
-
             result, string_message = self.db.try_play_word(
                 server_id=server.id, word=content, player_id=author.id
             )
