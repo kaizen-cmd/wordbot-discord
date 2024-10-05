@@ -54,9 +54,11 @@ class App:
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
             ):
-                await self.CLIENT.get_channel(
-                    self.CLIENT.SUPPORT_SERVER_LOG_CHANNEL_ID
-                ).send(f"Server {interaction.guild.name} on boarded")
+                await self.get_channel(
+                    WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID
+                ).send(
+                    f"[ACTIVATED] Server {interaction.guild.name} | Members: {interaction.guild.member_count}"
+                )
 
         @self.CLIENT.tree.command(
             name="deactivate",
@@ -77,9 +79,11 @@ class App:
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
             ):
-                await self.CLIENT.get_channel(
-                    self.CLIENT.SUPPORT_SERVER_LOG_CHANNEL_ID
-                ).send(f"Server {interaction.guild.name} de-activated")
+                await self.get_channel(
+                    WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID
+                ).send(
+                    f"[DE-ACTIVATED] Server {interaction.guild.name} | Members: {interaction.guild.member_count}"
+                )
 
         @self.CLIENT.tree.command(
             name="global_leaderboard", description="get global leaders in wordchain"
