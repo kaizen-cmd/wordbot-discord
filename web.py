@@ -23,7 +23,7 @@ from scripts.send_custom_message import (
 from scripts.send_dm import create_dm_channel, send_dm
 
 logging.basicConfig(
-    filename="web.log",
+    filename="logs/web.log",
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
@@ -221,7 +221,7 @@ def logs(request: Request):
 @app.websocket("/stream-logs")
 async def stream_logs(websocket: WebSocket):
     await websocket.accept()
-    f = open("app.log")
+    f = open("logs/app.log")
     try:
         while True:
             lines = f.readlines()

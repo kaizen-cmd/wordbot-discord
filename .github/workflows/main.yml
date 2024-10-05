@@ -34,8 +34,7 @@ jobs:
             git pull origin main
             sudo cp wordchain.service /etc/systemd/system/wordchain.service
             sudo cp web.service /etc/systemd/system/web.service
-            touch active_members.txt
-            touch global_ranks.txt
+            mkdir -p logs
             source venv/bin/activate
             pip install -r requirements.txt
             sudo systemctl daemon-reload

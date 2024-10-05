@@ -89,12 +89,6 @@ def broadcast(message="Hello!"):
 
 
 def broadcast_embed(message="Hello!"):
-    logging.basicConfig(
-        filename="broadcast.log",
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
-    logger = logging.getLogger("broadcast_message_log")
     global server_channel_mapping
     global headers
     response = requests.get(
@@ -116,15 +110,6 @@ def broadcast_embed(message="Hello!"):
                 headers=headers,
                 json=data,
             )
-
-            if response.status_code == 200:
-                logger.info(
-                    f"Message sent to channel {channel_id} in guild {server['name']}"
-                )
-            else:
-                logger.error(
-                    f"Failed to send message to channel {channel_id} in guild {server_id}. Status code: {response.status_code}"
-                )
 
 
 if __name__ == "__main__":
