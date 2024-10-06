@@ -54,7 +54,7 @@ class App:
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
             ):
-                await self.get_channel(
+                await self.CLIENT.get_channel(
                     WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID
                 ).send(
                     f"[ACTIVATED] Server {interaction.guild.name} | Members: {interaction.guild.member_count}"
@@ -79,7 +79,7 @@ class App:
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
             ):
-                await self.get_channel(
+                await self.CLIENT.get_channel(
                     WordChainClient.SUPPORT_SERVER_LOG_CHANNEL_ID
                 ).send(
                     f"[DE-ACTIVATED] Server {interaction.guild.name} | Members: {interaction.guild.member_count}"
