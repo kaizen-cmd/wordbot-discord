@@ -4,7 +4,7 @@ import os
 import requests
 
 
-def get_bot_guilds():
+def get_bot_guilds(servers=None):
     headers = {"Authorization": f"Bot {os.getenv('BOT_TOKEN')}"}
     url = "https://discord.com/api/v10/users/@me/guilds?with_counts=true"
 
@@ -17,7 +17,8 @@ def get_bot_guilds():
     result = list()
     api_call_fails = 0
     response = None
-    while api_call_fails < 5:
+    server_count = 0
+    while api_call_fails < 5 and (not servers or server_count < servers):
         if last_id == -1:
             try:
                 response = requests.get(url, headers=headers)
@@ -51,6 +52,7 @@ def get_bot_guilds():
                         "icons": guild["icon"],
                     }
                 )
+                server_count += 1
         else:
             break
 

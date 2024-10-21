@@ -105,7 +105,10 @@ async def vote_callback(request: Request):
 
 @app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+    guilds_meta = get_bot_guilds(servers=50)
+    return templates.TemplateResponse(
+        "home.html", {"request": request, "guilds_meta": guilds_meta}
+    )
 
 
 @app.get("/admin")
