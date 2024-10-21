@@ -196,7 +196,8 @@
       let currentLine = 0;
       let currentImageCount = 1;
       let imgPos = [1, 3, 5, 7];
-      let data = JSON.parse("{{ guilds_meta | tojson | safe }}");
+      // prettier-ignore
+      let data = JSON.parse('{{ guilds_meta | tojson | safe }}');
       let ci = 0;
       let intervalId = setInterval(() => {
         let parsedData = data[ci];
