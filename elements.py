@@ -18,9 +18,11 @@ class VoteButton(discord.ui.View):
 class GamingRefreeEmbed(discord.Embed):
 
     def __init__(self, *args, **kwargs):
-        image_url = kwargs.pop("image_url")
+        image_url = None
+        if "image_url" in kwargs:
+            image_url = kwargs.pop("image_url")
         super().__init__(*args, **kwargs)
-        self.set_image(url=image_url) if image_url else None
+        self.set_image(url=image_url)
         self.url = "https://gamingrefree.online"
         self.colour = 0x1EEB36
         self.set_footer(
