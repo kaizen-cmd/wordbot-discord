@@ -217,7 +217,7 @@ class WordChainClient(commands.AutoShardedBot):
             name="",
             inline=False,
         )
-        embed.set_thumbnail(url=author.avatar.url)
+        embed.set_thumbnail(url=author.avatar.url if author.avatar else None)
         return embed
 
     def _send_meaning(self, word: str):
