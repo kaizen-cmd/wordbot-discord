@@ -1,5 +1,6 @@
 import sqlite3
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +16,16 @@ word_tables = [
     ).fetchall()
 ]
 
+curr.close()
+conn.close()
 
 logger.info(f"{len(word_tables)} word tables found")
 word_count = 0
 
 start_letters = "abcdefghijklmnopqrstuvwxyz"
 for word_table in word_tables:
+    conn = sqlite3.connect("../db.sqlite3")
+    curr = conn.cursor()
     for letter in start_letters:
         words = curr.execute(
             f"SELECT word FROM {word_table} WHERE isUsed = 1 AND word LIKE ? ORDER BY RANDOM() LIMIT 5",
@@ -34,8 +39,9 @@ for word_table in word_tables:
                 f"UPDATE {word_table} SET isUsed = 0 WHERE word IN ({placeholders})",
                 word_list,
             )
+    conn.commit()
+    curr.close()
+    conn.close()
+    time.sleep(100)
 
 logger.info(f"{word_count} words refreshed")
-
-conn.commit()
-conn.close()
