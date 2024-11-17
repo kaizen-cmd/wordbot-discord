@@ -1,4 +1,9 @@
 import sqlite3
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.info("REFRESHING WORDS !")
 
 conn = sqlite3.connect("db.sqlite3")
 curr = conn.cursor()
