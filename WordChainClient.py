@@ -12,6 +12,11 @@ from elements import GamingRefreeEmbed
 from MultiServerWordChainDB import MultiServerWordChainDB
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename="logs/wordchainclient.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 
 class WordChainClient(commands.AutoShardedBot):
@@ -30,6 +35,7 @@ class WordChainClient(commands.AutoShardedBot):
         f.close()
 
     async def on_ready(self):
+        logger.info("Bot is ready")
         await self.change_presence(
             status=discord.Status.do_not_disturb,
             activity=discord.Game(
@@ -77,17 +83,19 @@ class WordChainClient(commands.AutoShardedBot):
                 coroutines.append(message.reply(string_message))
 
             await asyncio.gather(*coroutines)
+            self.db.refresh_words(server_id=server.id)
 
         except Exception as e:
             logger.error(
-                f"[WORD PLAY ERROR]: {message.content} == {e} == {message.guild.name}"
+                f"[WORD PLAY ERROR]: {message.content} == {e} == {message.guild.name}",
+                exc_info=True,
             )
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         try:
             self.db.deboard_server(server.id)
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Error deboarding server {server.id}: {e}", exc_info=True)
         await self.change_presence(
             status=discord.Status.do_not_disturb,
             activity=discord.Game(
@@ -99,6 +107,7 @@ class WordChainClient(commands.AutoShardedBot):
         )
 
     async def on_guild_join(self, server: discord.Guild):
+        logger.info(f"Joined new guild: {server.name}")
         await self.change_presence(
             status=discord.Status.do_not_disturb,
             activity=discord.Game(
@@ -126,7 +135,9 @@ class WordChainClient(commands.AutoShardedBot):
         try:
             self.db.deboard_server(server_id=server.id)
         except Exception as e:
-            pass
+            logger.error(
+                f"Error deactivating bot for server {server.id}: {e}", exc_info=True
+            )
         embed = GamingRefreeEmbed()
         embed.title = "Game stopped and scores reset"
         embed.description = (
@@ -165,9 +176,10 @@ class WordChainClient(commands.AutoShardedBot):
             try:
                 if not embed.thumbnail.url:
                     embed.set_thumbnail(url=user.avatar.url)
-            except:
+            except Exception as e:
                 logger.error(
-                    f"[SERVER LEADERBOARD COMMAND] Error in setting leaderboard thumbnail for user {user.global_name}"
+                    f"[SERVER LEADERBOARD COMMAND] Error in setting leaderboard thumbnail for user {user.global_name}",
+                    exc_info=True,
                 )
             embed.add_field(
                 value=f"#{rank}.        {user.mention}         {score} coins 💰",
@@ -194,9 +206,10 @@ class WordChainClient(commands.AutoShardedBot):
             try:
                 if not embed.thumbnail.url:
                     embed.set_thumbnail(url=user.avatar.url)
-            except:
+            except Exception as e:
                 logger.error(
-                    f"[SERVER LEADERBOARD COMMAND] Error in setting leaderboard thumbnail for user {user.global_name}"
+                    f"[SERVER LEADERBOARD COMMAND] Error in setting leaderboard thumbnail for user {user.global_name}",
+                    exc_info=True,
                 )
             embed.add_field(
                 value=f"#{rank}.        @{user.global_name}         {score} coins 💰",

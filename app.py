@@ -50,6 +50,7 @@ class App:
 
             embed = self.CLIENT._activate_bot(interaction.guild, interaction.channel)
             await interaction.response.send_message(embed=embed, view=VoteButton())
+            logger.info(f"Activated game in server {interaction.guild.name}")
             if (
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
@@ -75,6 +76,7 @@ class App:
 
             embed = self.CLIENT._deactivate_bot(interaction.guild, interaction.channel)
             await interaction.response.send_message(embed=embed, view=VoteButton())
+            logger.info(f"Deactivated game in server {interaction.guild.name}")
             if (
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
                 or self.CLIENT.user.name == "word-chain-test"
@@ -137,6 +139,9 @@ class App:
             await interaction.response.send_message(
                 f"Words starting with `{letter}` exhausted. A new letter will be suggested whenever a word ends in this letter. New letter is `{new_letter}`"
             )
+            logger.info(
+                f"Exhausted words starting with {letter} in server {interaction.guild.name}"
+            )
 
         @self.CLIENT.tree.command(
             name="score", description="get score of the mentioned user"
@@ -190,6 +195,7 @@ class App:
             await interaction.response.send_message("Launching SOON!")
 
     def run(self):
+        logger.info("Running the bot")
         self.CLIENT.run(self.TOKEN)
 
 

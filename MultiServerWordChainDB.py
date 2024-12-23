@@ -1,9 +1,15 @@
 import logging
 import random
 import sqlite3
-from collections import defaultdict, namedtuple
+from collections import namedtuple
+import datetime
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename="logs/multiserverwordchaindb.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 
 class MultiServerWordChainDB:
@@ -17,6 +23,7 @@ class MultiServerWordChainDB:
         self.marks_for_same_start_end_word = 2
         self.char_list = list("abcdefghijklmnopqrstuvwxyz")
         self._create_voting_record_table()
+        self._create_words_refresh_table()
 
     def __del__(self):
         self.curr.close()
@@ -226,6 +233,25 @@ class MultiServerWordChainDB:
         VotingRecord = namedtuple("voting_record", ["user_id", "word_count"])
         return VotingRecord(voting_record[0], voting_record[1])
 
+    def refresh_words(self, server_id):
+        last_refresh = self.curr.execute(
+            f"SELECT timestamp FROM words_refresh WHERE server_id='{server_id}'"
+        ).fetchone()
+
+        if (
+            not last_refresh
+            or last_refresh < datetime.datetime.now() - datetime.timedelta(days=7)
+        ):
+            logger.info(f"[WORD REFRESH] Refreshing words for server {server_id}")
+            word_table = self.get_words_table_name(server_id)
+            self.curr.execute(
+                f"UPDATE {word_table} SET isUsed=0 WHERE word IN (SELECT word FROM {word_table} WHERE isUsed=1 ORDER BY RANDOM() LIMIT 50)"
+            )
+            self.curr.execute(
+                f"INSERT INTO words_refresh VALUES(datetime('now'), '{server_id}')"
+            )
+            self.conn.commit()
+
     def _change_letter(self, server_id):
 
         word_table = self.get_words_table_name(server_id)
@@ -246,4 +272,9 @@ class MultiServerWordChainDB:
     def _create_voting_record_table(self):
         self.curr.execute(
             "CREATE TABLE IF NOT EXISTS voting_records(user_id VARCHAR(255), word_count INTEGER)"
+        )
+
+    def _create_words_refresh_table(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS words_refresh(timestamp TIMESTAMP, server_id VARCHAR(255))"
         )

@@ -43,11 +43,12 @@ app.mount("/static/", StaticFiles(directory="static"), name="static")
 
 @app.post("/vote-callback")
 async def vote_callback(request: Request):
-    logger.info("hello world")
+    logger.info("Received vote callback")
     word_count = 5
 
     # Check for correct authorization
     if request.headers.get("Authorization") != "super_secret_password":
+        logger.warning("Unauthorized vote callback attempt")
         return "Hello World"
 
     # Fetch the data from the request
@@ -105,6 +106,7 @@ async def vote_callback(request: Request):
 
 @app.get("/")
 async def home(request: Request):
+    logger.info("Home page accessed")
     guilds_meta = get_bot_guilds(servers=50)
     return templates.TemplateResponse(
         "home.html", {"request": request, "guilds_meta": guilds_meta}
@@ -113,6 +115,7 @@ async def home(request: Request):
 
 @app.get("/admin")
 async def admin_get(request: Request):
+    logger.info("Admin page accessed")
     if not request.session.get("authenticated"):
         return templates.TemplateResponse("login.html", {"request": request})
 
@@ -147,6 +150,7 @@ async def admin_get(request: Request):
 async def admin_post(
     request: Request, username: str = Form(...), password: str = Form(...)
 ):
+    logger.info("Admin login attempt")
     if username == "slav" and password == "Konnichiwa@11Hajimimashte@11":
         request.session["authenticated"] = True
     return RedirectResponse("/admin", status_code=303)
@@ -156,6 +160,7 @@ async def admin_post(
 async def send_message(
     request: Request, message: str = Form(...), server_id: str = Form(...)
 ):
+    logger.info(f"Sending message to server {server_id}")
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
     send_to_server(message, server_id)
@@ -164,6 +169,7 @@ async def send_message(
 
 @app.post("/broadcast")
 async def broadcast_message(request: Request, broadcast_message: str = Form(...)):
+    logger.info("Broadcasting message")
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
     multiprocessing.Process(
@@ -179,6 +185,7 @@ async def broadcast_embed_(
     description: str = Form(...),
     image: str = Form(None),
 ):
+    logger.info("Broadcasting embed")
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
     embed = GamingRefreeEmbed(
@@ -201,6 +208,7 @@ async def unicast_embed(
     server_id: str = Form(...),
     image: str = Form(None),
 ):
+    logger.info(f"Unicasting embed to server {server_id}")
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
 
@@ -216,6 +224,7 @@ async def unicast_embed(
 
 @app.get("/logs")
 def logs(request: Request):
+    logger.info("Logs page accessed")
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
     return templates.TemplateResponse("log.html", {"request": request})
@@ -223,6 +232,7 @@ def logs(request: Request):
 
 @app.websocket("/stream-logs")
 async def stream_logs(websocket: WebSocket):
+    logger.info("Streaming logs to websocket client")
     await websocket.accept()
     f = open("logs/app.log")
     try:
@@ -234,7 +244,7 @@ async def stream_logs(websocket: WebSocket):
             for line in lines:
                 await websocket.send_text(line)
     except WebSocketDisconnect:
-        print("Disconnected client")
+        logger.info("WebSocket client disconnected")
     finally:
         f.close()
         websocket.close()
