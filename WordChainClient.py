@@ -83,13 +83,14 @@ class WordChainClient(commands.AutoShardedBot):
                 coroutines.append(message.reply(string_message))
 
             await asyncio.gather(*coroutines)
-            self.db.refresh_words(server_id=server.id)
 
         except Exception as e:
             logger.error(
                 f"[WORD PLAY ERROR]: {message.content} == {e} == {message.guild.name}",
                 exc_info=True,
             )
+
+        self.db.refresh_words(server_id=server.id)
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         try:
