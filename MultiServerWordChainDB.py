@@ -238,10 +238,9 @@ class MultiServerWordChainDB:
             f"SELECT timestamp FROM words_refresh WHERE server_id='{server_id}'"
         ).fetchone()
 
-        if (
-            not last_refresh
-            or last_refresh < datetime.datetime.now() - datetime.timedelta(days=7)
-        ):
+        if not last_refresh or last_refresh[
+            0
+        ] < datetime.datetime.now() - datetime.timedelta(days=7):
             logger.info(f"[WORD REFRESH] Refreshing words for server {server_id}")
             word_table = self.get_words_table_name(server_id)
             self.curr.execute(
