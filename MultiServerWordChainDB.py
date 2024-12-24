@@ -250,8 +250,11 @@ class MultiServerWordChainDB:
             logger.info(f"[WORD REFRESH] Refreshing words for server {server_id}")
             word_table = self.get_words_table_name(server_id)
             for letter in "abcdefghijklmnopqrstuvwxyz":
+                limit = 5
+                if letter == "y":
+                    limit = 10
                 self.curr.execute(
-                    f"UPDATE {word_table} SET isUsed=0 WHERE word LIKE '{letter}%' ORDER BY RANDOM() LIMIT 5"
+                    f"UPDATE {word_table} SET isUsed=0 WHERE word LIKE '{letter}%' ORDER BY RANDOM() LIMIT {limit}"
                 )
             self.curr.execute(
                 f"INSERT INTO words_refresh VALUES(datetime('now'), '{server_id}')"
