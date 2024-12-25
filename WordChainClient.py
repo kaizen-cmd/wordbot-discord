@@ -24,6 +24,13 @@ class WordChainClient(commands.AutoShardedBot):
     SLAV_USER_ID = int(os.getenv("SLAV_USER_ID"))
     SUPPORT_SERVER_ID = int(os.getenv("SUPPORT_SERVER_ID"))
     SUPPORT_SERVER_LOG_CHANNEL_ID = int(os.getenv("SUPPORT_SERVER_LOG_CHANNEL_ID"))
+    POINTS_REACTIONS_MAP = {
+        4: "4️⃣",
+        6: "6️⃣",
+        8: "8️⃣",
+        12: "🔥",
+        16: "🤑",
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,13 +71,15 @@ class WordChainClient(commands.AutoShardedBot):
             if self.server_channel_mapping.get(str(server.id)) != channel.id:
                 return
 
-            result, string_message = self.db.try_play_word(
+            result, string_message, points = self.db.try_play_word(
                 server_id=server.id, word=content, player_id=author.id
             )
 
             coroutines = list()
             if result:
-                coroutines.append(message.add_reaction("💰"))
+                coroutines.append(
+                    message.add_reaction(WordChainClient.POINTS_REACTIONS_MAP[points])
+                )
                 if len(string_message) == 1:
                     coroutines.append(
                         message.reply(

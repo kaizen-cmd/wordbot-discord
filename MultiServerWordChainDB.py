@@ -112,6 +112,7 @@ class MultiServerWordChainDB:
             return (
                 False,
                 f"It is not your turn. **{self.negative_marks} coins 💰 deducted**",
+                self.negative_marks,
             )
 
         if last_char and word[0] != last_char:
@@ -124,6 +125,7 @@ class MultiServerWordChainDB:
             return (
                 False,
                 f"Write a word starting with {last_char}. **{self.negative_marks} coins 💰 deducted**",
+                self.negative_marks,
             )
 
         word_result = self.curr.execute(
@@ -131,34 +133,33 @@ class MultiServerWordChainDB:
         ).fetchone()
 
         if not word_result:
-            return (False, "Word does not exist in the dictionary")
+            return (False, "Word does not exist in the dictionary", 0)
 
         word_in_db, is_word_used = word_result
 
         if is_word_used:
-            return (False, "Word already used")
+            return (False, "Word already used", 0)
 
         voting_record = self.curr.execute(
             f"SELECT word_count FROM voting_records WHERE user_id='{player_id}'"
         ).fetchone()
         points_obtained = 0
-        if len(word) > 7:
-            user_score += self.marks_for_word_length_gte_seven
+        if len(word) >= 7:
             points_obtained += self.marks_for_word_length_gte_seven
         else:
-            user_score += self.marks_for_word_length_lte_seven
             points_obtained += self.marks_for_word_length_lte_seven
 
         if word[0] == word[-1]:
-            user_score += self.marks_for_same_start_end_word
             points_obtained += self.marks_for_same_start_end_word
 
         if voting_record and voting_record[0] > 0 and points_obtained > 0:
-            user_score += points_obtained
+            points_obtained += points_obtained
             self.curr.execute(
                 f"UPDATE voting_records SET word_count={voting_record[0] - 1} WHERE user_id='{player_id}'"
             )
             self.conn.commit()
+
+        user_score += points_obtained
 
         self.curr.execute(
             f"UPDATE users SET score=? WHERE user_id=? AND server_id=?",
@@ -174,9 +175,9 @@ class MultiServerWordChainDB:
             f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{word[-1]}%' LIMIT 1"
         ).fetchone()
         if not next_word_exists:
-            return (True, self._change_letter(server_id=server_id))
+            return (True, self._change_letter(server_id=server_id), points_obtained)
 
-        return (True, "Word accepted")
+        return (True, "Word accepted", points_obtained)
 
     def get_score(self, server_id, player_id):
 
