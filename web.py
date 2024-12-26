@@ -1,11 +1,10 @@
-import asyncio
 import logging
-import multiprocessing
 import os
 import sqlite3
 from collections import namedtuple
+from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Form, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Form
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -14,13 +13,9 @@ from starlette.requests import Request
 
 from elements import GamingRefreeEmbed
 from scripts.get_bot_guilds import get_bot_guilds
-from scripts.send_custom_message import (
-    broadcast,
-    broadcast_embed,
-    send_embed_to_server,
-    send_to_server,
-)
+from scripts.send_custom_message import send_embed_to_server, send_to_server
 from scripts.send_dm import create_dm_channel, send_dm
+from tasks import TaskQueue
 
 logging.basicConfig(
     filename="logs/web.log",
@@ -29,7 +24,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+tq = TaskQueue()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    tq.start_processing()
+    yield
+    tq.stop()
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 # Add session middleware for managing sessions
 app.add_middleware(SessionMiddleware, secret_key="1qaz2wsx3edc4rfv")
@@ -135,6 +141,8 @@ async def admin_get(request: Request):
     curr.close()
     conn.close()
 
+    inprogress_tasks = tq.get_inprogress()
+
     for server in servers:
         server["active_members"] = server_active_users_map.get(
             str(server["id"]), "DataNA"
@@ -142,7 +150,12 @@ async def admin_get(request: Request):
 
     return templates.TemplateResponse(
         "admin.html",
-        {"request": request, "servers": servers, "active_members": active_members},
+        {
+            "request": request,
+            "servers": servers,
+            "active_members": active_members,
+            "inprogress_tasks": inprogress_tasks,
+        },
     )
 
 
@@ -172,9 +185,7 @@ async def broadcast_message(request: Request, broadcast_message: str = Form(...)
     logger.info("Broadcasting message")
     if request.session.get("authenticated") != True:
         return RedirectResponse("/admin", status_code=303)
-    multiprocessing.Process(
-        target=broadcast, args=(broadcast_message,), daemon=False
-    ).start()
+    tq.submit(target="broadcast", data=broadcast_message)
     return RedirectResponse("/admin", status_code=303)
 
 
@@ -193,10 +204,7 @@ async def broadcast_embed_(
         description=description,
         image_url=image if image else None,
     )
-
-    multiprocessing.Process(
-        target=broadcast_embed, args=(embed.to_dict(),), daemon=False
-    ).start()
+    tq.submit(target="broadcast_embed", data=embed.to_dict())
     return RedirectResponse("/admin", status_code=303)
 
 
@@ -220,31 +228,3 @@ async def unicast_embed(
 
     send_embed_to_server(embed.to_dict(), server_id)
     return RedirectResponse("/admin", status_code=303)
-
-
-@app.get("/logs")
-def logs(request: Request):
-    logger.info("Logs page accessed")
-    if request.session.get("authenticated") != True:
-        return RedirectResponse("/admin", status_code=303)
-    return templates.TemplateResponse("log.html", {"request": request})
-
-
-@app.websocket("/stream-logs")
-async def stream_logs(websocket: WebSocket):
-    logger.info("Streaming logs to websocket client")
-    await websocket.accept()
-    f = open("logs/app.log")
-    try:
-        while True:
-            lines = f.readlines()
-            if not lines:
-                await asyncio.sleep(1)
-                continue
-            for line in lines:
-                await websocket.send_text(line)
-    except WebSocketDisconnect:
-        logger.info("WebSocket client disconnected")
-    finally:
-        f.close()
-        websocket.close()
