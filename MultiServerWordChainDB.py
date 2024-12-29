@@ -3,6 +3,7 @@ import random
 import sqlite3
 from collections import namedtuple
 import datetime
+from typing import Tuple
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -24,6 +25,7 @@ class MultiServerWordChainDB:
         self.char_list = list("abcdefghijklmnopqrstuvwxyz")
         self._create_voting_record_table()
         self._create_words_refresh_table()
+        self._alter_users_table_for_streak_and_last_played()
 
     def __del__(self):
         self.curr.close()
@@ -113,6 +115,8 @@ class MultiServerWordChainDB:
                 False,
                 f"It is not your turn. **{self.negative_marks} coins 💰 deducted**",
                 self.negative_marks,
+                -1,
+                "",
             )
 
         if last_char and word[0] != last_char:
@@ -126,6 +130,8 @@ class MultiServerWordChainDB:
                 False,
                 f"Write a word starting with {last_char}. **{self.negative_marks} coins 💰 deducted**",
                 self.negative_marks,
+                -1,
+                "",
             )
 
         word_result = self.curr.execute(
@@ -133,12 +139,18 @@ class MultiServerWordChainDB:
         ).fetchone()
 
         if not word_result:
-            return (False, "Word does not exist in the dictionary", 0)
+            return (
+                False,
+                "Word does not exist in the dictionary",
+                0,
+                -1,
+                "",
+            )
 
         word_in_db, is_word_used = word_result
 
         if is_word_used:
-            return (False, "Word already used", 0)
+            return (False, "Word already used", 0, -1, "")
 
         voting_record = self.curr.execute(
             f"SELECT word_count FROM voting_records WHERE user_id='{player_id}'"
@@ -174,10 +186,74 @@ class MultiServerWordChainDB:
         next_word_exists = self.curr.execute(
             f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{word[-1]}%' LIMIT 1"
         ).fetchone()
-        if not next_word_exists:
-            return (True, self._change_letter(server_id=server_id), points_obtained)
 
-        return (True, "Word accepted", points_obtained)
+        streak_count, streak_message = self._update_user_streak(server_id, player_id)
+
+        if not next_word_exists:
+            return (
+                True,
+                self._change_letter(server_id=server_id),
+                points_obtained,
+                streak_count,
+                streak_message,
+            )
+
+        return (
+            True,
+            "Word accepted",
+            points_obtained,
+            streak_count,
+            streak_message,
+        )
+
+    def _update_user_streak(self, server_id, player_id) -> Tuple[int, str]:
+        streak, message = -1, ""
+        self.curr.execute(
+            "SELECT last_played FROM users WHERE user_id=? AND server_id=?",
+            (player_id, server_id),
+        )
+        last_played = self.curr.fetchone()[0]
+        if not last_played:
+            self.curr.execute(
+                "UPDATE users SET last_played=datetime('now') WHERE user_id=? AND server_id=?",
+                (player_id, server_id),
+            )
+            self.curr.execute(
+                "UPDATE users SET streak=1 WHERE user_id=? AND server_id=?",
+                (player_id, server_id),
+            )
+            streak = 1
+            message = "You have started a new streak"
+        else:
+            play_time = datetime.datetime.now()
+            last_played = datetime.datetime.strptime(last_played, "%Y-%m-%d %H:%M:%S")
+            if play_time > last_played + datetime.timedelta(
+                days=1
+            ) and play_time < last_played + datetime.timedelta(days=2):
+                self.curr.execute(
+                    "UPDATE users SET streak=streak+1 WHERE user_id=? AND server_id=?",
+                    (player_id, server_id),
+                )
+                self.curr.execute(
+                    "UPDATE users SET last_played=datetime('now') WHERE user_id=? AND server_id=?",
+                    (player_id, server_id),
+                )
+                self.conn.commit()
+                self.curr.execute(
+                    "SELECT streak FROM users WHERE user_id=? AND server_id=?",
+                    (player_id, server_id),
+                )
+                streak = self.curr.fetchone()[0]
+                message = f"🔥Streak achieved for **{streak}** days🔥"
+            elif play_time > last_played + datetime.timedelta(days=2):
+                self.curr.execute(
+                    "UPDATE users SET streak=1 WHERE user_id=? AND server_id=?",
+                    (player_id, server_id),
+                )
+                self.conn.commit()
+                streak = 1
+                message = "Streak lost. New streak started"
+        return streak, message
 
     def get_score(self, server_id, player_id):
 
@@ -187,6 +263,14 @@ class MultiServerWordChainDB:
             return (False, "Ask them to start playing")
         id, score, rank = result
         return (True, (id, score, rank))
+
+    def get_streak_count(self, server_id, player_id):
+        self.curr.execute(
+            "SELECT streak FROM users WHERE user_id=? AND server_id=?",
+            (player_id, server_id),
+        )
+        streak = self.curr.fetchone()[0] or 1
+        return streak
 
     def leaderboard(self, server_id):
         QUERY = f"SELECT user_id, score FROM users WHERE server_id='{server_id}' ORDER BY score DESC LIMIT 5"
@@ -201,15 +285,17 @@ class MultiServerWordChainDB:
         return (True, result)
 
     def get_global_leaderboard(self):
-        QUERY = f"SELECT user_id, score FROM users ORDER BY score DESC LIMIT 5"
+        QUERY = (
+            f"SELECT user_id, score, server_id FROM users ORDER BY score DESC LIMIT 5"
+        )
         user_rows = self.curr.execute(QUERY).fetchall()
         if not user_rows:
             return (False, "Start playing")
 
         result = []
         for rank, user_row in enumerate(user_rows, start=1):
-            id, score = user_row
-            result.append((rank, id, score))
+            id, score, server_id = user_row
+            result.append((rank, id, score, server_id))
         return (True, result)
 
     def create_or_update_voting_record(self, user_id: str, word_count: int):
@@ -290,3 +376,16 @@ class MultiServerWordChainDB:
         self.curr.execute(
             "CREATE TABLE IF NOT EXISTS words_refresh(timestamp TIMESTAMP, server_id VARCHAR(255))"
         )
+
+    def _alter_users_table_for_streak_and_last_played(self):
+        try:
+            self.curr.execute("SELECT streak FROM users")
+        except sqlite3.OperationalError:
+            self.curr.execute("ALTER TABLE users ADD COLUMN streak INTEGER DEFAULT 0")
+            self.conn.commit()
+
+        try:
+            self.curr.execute("SELECT last_played FROM users")
+        except sqlite3.OperationalError:
+            self.curr.execute("ALTER TABLE users ADD COLUMN last_played TIMESTAMP ")
+            self.conn.commit()

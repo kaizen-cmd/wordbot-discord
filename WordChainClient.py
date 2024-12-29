@@ -71,8 +71,10 @@ class WordChainClient(commands.AutoShardedBot):
             if self.server_channel_mapping.get(str(server.id)) != channel.id:
                 return
 
-            result, string_message, points = self.db.try_play_word(
-                server_id=server.id, word=content, player_id=author.id
+            result, string_message, points, streak_count, streak_message = (
+                self.db.try_play_word(
+                    server_id=server.id, word=content, player_id=author.id
+                )
             )
 
             coroutines = list()
@@ -86,6 +88,8 @@ class WordChainClient(commands.AutoShardedBot):
                             f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
                         )
                     )
+                if streak_count != -1:
+                    coroutines.append(message.reply(streak_message))
 
             else:
                 coroutines.append(message.add_reaction("❌"))
@@ -179,6 +183,7 @@ class WordChainClient(commands.AutoShardedBot):
         coroutines = list()
         for user_row in data:
             rank, id, score = user_row
+            streak_count = self.db.get_streak_count(server.id, id)
             coroutines.append(self.fetch_user(id))
         users = await asyncio.gather(*coroutines)
         for user, user_row in zip(users, data):
@@ -192,8 +197,8 @@ class WordChainClient(commands.AutoShardedBot):
                     exc_info=True,
                 )
             embed.add_field(
-                value=f"#{rank}.        {user.mention}         {score} coins 💰",
-                name="",
+                value=f"{score} coins 💰 | {streak_count} days streak 🔥",
+                name=f"#{rank} {user.global_name}",
                 inline=False,
             )
 
@@ -208,11 +213,12 @@ class WordChainClient(commands.AutoShardedBot):
 
         coroutines = list()
         for user_row in data:
-            rank, id, score = user_row
+            rank, id, score, server_id = user_row
             coroutines.append(self.fetch_user(id))
         users = await asyncio.gather(*coroutines)
         for user, user_row in zip(users, data):
-            rank, id, score = user_row
+            rank, id, score, server_id = user_row
+            streak_count = self.db.get_streak_count(server_id, id)
             try:
                 if not embed.thumbnail.url:
                     embed.set_thumbnail(url=user.avatar.url)
@@ -222,8 +228,8 @@ class WordChainClient(commands.AutoShardedBot):
                     exc_info=True,
                 )
             embed.add_field(
-                value=f"#{rank}.        @{user.global_name}         {score} coins 💰",
-                name="",
+                value=f"{score} coins 💰 | {streak_count} days streak 🔥",
+                name=f"#{rank} {user.global_name}",
                 inline=False,
             )
 
@@ -231,13 +237,14 @@ class WordChainClient(commands.AutoShardedBot):
 
     def _send_user_score(self, author: discord.User, server: discord.Guild):
         result, data = self.db.get_score(server.id, author.id)
+        streak_count = self.db.get_streak_count(server.id, author.id)
         if not result:
             return data
         id, score, rank = data
         embed = GamingRefreeEmbed(title=f"{author.global_name}'s score")
         embed.add_field(
-            value=f"Rank {rank}.    @{author.global_name}    {score} coins 💰",
-            name="",
+            value=f"**{score}** coins 💰 | **{streak_count} days streak** 🔥",
+            name=f"Rank {rank}",
             inline=False,
         )
         embed.set_thumbnail(url=author.avatar.url if author.avatar else None)
