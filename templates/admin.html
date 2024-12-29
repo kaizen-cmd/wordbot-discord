@@ -209,8 +209,36 @@
         navigator.clipboard.writeText(serverID);
       }
 
+      function fetch_servers() {
+        fetch("/servers")
+          .then((response) => response.json())
+          .then((data) => {
+            const table = document.getElementById("serverTable");
+            const tbody = table.getElementsByTagName("tbody")[0];
+            tbody.innerHTML = "";
+
+            data.servers.forEach((server) => {
+              const row = tbody.insertRow();
+              row.innerHTML = `
+                <td onclick="copyServerID('${server.id}')">${server.name}</td>
+                <td>
+                  <div style="width: 15px; height: 15px; background-color: ${
+                    server.activation_status ? "rgb(18, 234, 18)" : "red"
+                  }; margin: 0 auto; color: #00695d00">
+                    ${server.activation_status}
+                  </div>
+                </td>
+                <td>${server.member_count}</td>
+                <td>${server.active_members}</td>
+              `;
+            });
+
+            countServers();
+          });
+      }
+
       // Call countServers function when the page loads
-      window.onload = countServers;
+      window.onload = fetch_servers();
     </script>
   </head>
   <body>

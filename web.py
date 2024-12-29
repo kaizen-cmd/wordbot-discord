@@ -121,7 +121,22 @@ async def home(request: Request):
 
 @app.get("/admin")
 async def admin_get(request: Request):
-    logger.info("Admin page accessed")
+    if not request.session.get("authenticated"):
+        return templates.TemplateResponse("login.html", {"request": request})
+
+    inprogress_tasks = tq.get_inprogress()
+
+    return templates.TemplateResponse(
+        "admin.html",
+        {
+            "request": request,
+            "inprogress_tasks": inprogress_tasks,
+        },
+    )
+
+
+@app.get("/servers")
+def get_servers(request: Request):
     if not request.session.get("authenticated"):
         return templates.TemplateResponse("login.html", {"request": request})
 
@@ -141,22 +156,15 @@ async def admin_get(request: Request):
     curr.close()
     conn.close()
 
-    inprogress_tasks = tq.get_inprogress()
-
     for server in servers:
         server["active_members"] = server_active_users_map.get(
             str(server["id"]), "DataNA"
         )
 
-    return templates.TemplateResponse(
-        "admin.html",
-        {
-            "request": request,
-            "servers": servers,
-            "active_members": active_members,
-            "inprogress_tasks": inprogress_tasks,
-        },
-    )
+    return {
+        "servers": servers,
+        "active_members": active_members,
+    }
 
 
 @app.post("/admin")
