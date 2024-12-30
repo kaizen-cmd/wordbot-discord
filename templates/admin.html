@@ -209,9 +209,7 @@
         navigator.clipboard.writeText(serverID);
       }
 
-      function fetch_servers() {
-        document.getElementById("totalServers").innerText = "Loading...";
-
+      function fetchServers() {
         fetch("/servers")
           .then((response) => response.json())
           .then((data) => {
@@ -242,7 +240,7 @@
       }
 
       // Call countServers function when the page loads
-      document.onload = fetch_servers();
+      document.onload = fetchServers();
     </script>
   </head>
   <body>

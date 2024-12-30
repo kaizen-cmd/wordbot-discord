@@ -342,6 +342,8 @@ class MultiServerWordChainDB:
                 )
                 used_words = self.curr.fetchone()[0]
                 limit = int(used_words * 0.3)
+                if letter in ("x", "z", "y"):
+                    limit = int(used_words * 0.6)
                 self.curr.execute(
                     f"UPDATE {word_table} SET isUsed=0 WHERE word LIKE '{letter}%' AND isUsed=1 ORDER BY RANDOM() LIMIT {limit}"
                 )
