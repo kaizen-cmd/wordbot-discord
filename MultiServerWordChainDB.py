@@ -333,6 +333,10 @@ class MultiServerWordChainDB:
             or last_refresh < datetime.datetime.now() - datetime.timedelta(days=7)
         ):
             logger.info(f"[WORD REFRESH] Refreshing words for server {server_id}")
+            self.curr.execute(
+                f"INSERT INTO words_refresh VALUES(datetime('now'), '{server_id}')"
+            )
+            self.conn.commit()
             word_table = self.get_words_table_name(server_id)
             for letter in "abcdefghijklmnopqrstuvwxyz":
                 self.curr.execute(
@@ -345,9 +349,6 @@ class MultiServerWordChainDB:
                 self.curr.execute(
                     f"UPDATE {word_table} SET isUsed=0 WHERE word LIKE '{letter}%' AND isUsed=1 ORDER BY RANDOM() LIMIT {limit}"
                 )
-            self.curr.execute(
-                f"INSERT INTO words_refresh VALUES(datetime('now'), '{server_id}')"
-            )
             self.conn.commit()
 
     def _change_letter(self, server_id):
