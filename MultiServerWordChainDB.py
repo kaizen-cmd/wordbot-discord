@@ -269,7 +269,7 @@ class MultiServerWordChainDB:
             "SELECT streak FROM users WHERE user_id=? AND server_id=?",
             (player_id, server_id),
         )
-        streak = self.curr.fetchone()[0] or 1
+        streak = self.curr.fetchone()[0]
         return streak
 
     def leaderboard(self, server_id):
@@ -338,10 +338,10 @@ class MultiServerWordChainDB:
             word_table = self.get_words_table_name(server_id)
             for letter in "abcdefghijklmnopqrstuvwxyz":
                 self.curr.execute(
-                    "SELECT COUNT(word) FROM {word_table} WHERE word LIKE '{letter}%' AND isUsed=1"
+                    f"SELECT COUNT(word) FROM {word_table} WHERE word LIKE '{letter}%' AND isUsed=1"
                 )
                 used_words = self.curr.fetchone()[0]
-                limit = int(used_words * 0.3)
+                limit = int(used_words * 0.4)
                 if letter in ("x", "z", "y"):
                     limit = int(used_words * 0.6)
                 self.curr.execute(
