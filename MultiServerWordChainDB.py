@@ -323,10 +323,12 @@ class MultiServerWordChainDB:
     def refresh_words(self, server_id):
         last_refresh = self.curr.execute(
             f"SELECT timestamp FROM words_refresh WHERE server_id='{server_id}'"
-        ).fetchone()[0]
+        ).fetchone()
 
         if last_refresh:
-            last_refresh = datetime.datetime.strptime(last_refresh, "%Y-%m-%d %H:%M:%S")
+            last_refresh = datetime.datetime.strptime(
+                last_refresh[0], "%Y-%m-%d %H:%M:%S"
+            )
 
         if (
             not last_refresh
