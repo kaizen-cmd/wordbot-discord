@@ -198,7 +198,7 @@ class WordChainClient(commands.AutoShardedBot):
         coroutines = list()
         for user_row in data:
             rank, id, score = user_row
-            streak_count = self.db.get_streak_count(server.id, id)
+            streak_count = self.db.get_streak_count(str(server.id), str(id))
             coroutines.append(self.fetch_user(id))
         users = await asyncio.gather(*coroutines)
         for user, user_row in zip(users, data):
