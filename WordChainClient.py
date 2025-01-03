@@ -71,10 +71,12 @@ class WordChainClient(commands.AutoShardedBot):
             if self.server_channel_mapping.get(str(server.id)) != channel.id:
                 return
 
-            result, string_message, points, streak_count, streak_message = (
-                self.db.try_play_word(
-                    server_id=server.id, word=content, player_id=author.id
-                )
+            result, string_message, points = self.db.try_play_word(
+                server_id=server.id, word=content, player_id=author.id
+            )
+
+            streak_count, streak_message = self.db.update_user_streak(
+                server_id=server.id, player_id=author.id
             )
 
             coroutines = list()

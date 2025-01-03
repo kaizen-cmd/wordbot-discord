@@ -115,8 +115,6 @@ class MultiServerWordChainDB:
                 False,
                 f"It is not your turn. **{self.negative_marks} coins 💰 deducted**",
                 self.negative_marks,
-                -1,
-                "",
             )
 
         if last_char and word[0] != last_char:
@@ -130,8 +128,6 @@ class MultiServerWordChainDB:
                 False,
                 f"Write a word starting with {last_char}. **{self.negative_marks} coins 💰 deducted**",
                 self.negative_marks,
-                -1,
-                "",
             )
 
         word_result = self.curr.execute(
@@ -143,8 +139,6 @@ class MultiServerWordChainDB:
                 False,
                 "Word does not exist in the dictionary",
                 0,
-                -1,
-                "",
             )
 
         word_in_db, is_word_used = word_result
@@ -187,26 +181,20 @@ class MultiServerWordChainDB:
             f"SELECT word FROM {word_table} WHERE isUsed=0 AND word LIKE '{word[-1]}%' LIMIT 1"
         ).fetchone()
 
-        streak_count, streak_message = self._update_user_streak(server_id, player_id)
-
         if not next_word_exists:
             return (
                 True,
                 self._change_letter(server_id=server_id),
                 points_obtained,
-                streak_count,
-                streak_message,
             )
 
         return (
             True,
             "Word accepted",
             points_obtained,
-            streak_count,
-            streak_message,
         )
 
-    def _update_user_streak(self, server_id, player_id) -> Tuple[int, str]:
+    def update_user_streak(self, server_id, player_id) -> Tuple[int, str]:
         streak, message = -1, ""
         self.curr.execute(
             "SELECT last_played FROM users WHERE user_id=? AND server_id=?",
@@ -222,6 +210,7 @@ class MultiServerWordChainDB:
                 "UPDATE users SET streak=1 WHERE user_id=? AND server_id=?",
                 (player_id, server_id),
             )
+            self.conn.commit()
             streak = 1
             message = "You have started a new streak"
         else:
