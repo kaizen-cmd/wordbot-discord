@@ -89,7 +89,7 @@ class WordChainClient(commands.AutoShardedBot):
                             f"Words beginning with {content[-1]} are over. New character is `{string_message}`"
                         )
                     )
-                if streak_count != -1:
+                if streak_count != -1 and len(streak_message) != 0:
                     coroutines.append(message.reply(streak_message))
 
             else:
