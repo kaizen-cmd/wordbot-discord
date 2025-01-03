@@ -194,6 +194,19 @@ class App:
                 return
             await interaction.response.send_message("Launching SOON!")
 
+        @self.CLIENT.tree.command(
+            name="top_servers", description="Top servers to score the most points"
+        )
+        async def top_servers(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
+            await interaction.response.defer(thinking=True)
+            message = await self.CLIENT._construct_and_send_top_servers()
+            if type(message) == str:
+                await interaction.followup.send(message)
+                return
+            await interaction.followup.send(embed=message, view=VoteButton())
+
     def run(self):
         logger.info("Running the bot")
         self.CLIENT.run(self.TOKEN)

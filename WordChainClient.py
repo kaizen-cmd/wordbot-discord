@@ -134,6 +134,20 @@ class WordChainClient(commands.AutoShardedBot):
             f"[INVITED] Server {server.name} | Members: {server.member_count}"
         )
 
+    async def _construct_and_send_top_servers(self):
+        result, data = self.db.get_top_servers()
+        if not result:
+            return data
+        embed = GamingRefreeEmbed(title="Top Servers")
+        for server_row in data:
+            rank, server_id, score = server_row
+            embed.add_field(
+                value=f"{score} coins 💰",
+                name=f"#{rank} {self.get_guild(int(server_id)).name}",
+                inline=False,
+            )
+        return embed
+
     def _exhaust_words_beginning_with(self, old_letter, server_id):
         self.db.curr.execute(
             f"UPDATE words_{server_id} SET isUsed=1 WHERE word LIKE '{old_letter}%'"

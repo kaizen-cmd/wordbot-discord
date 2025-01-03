@@ -342,6 +342,18 @@ class MultiServerWordChainDB:
                 )
             self.conn.commit()
 
+    def get_top_servers(self):
+        QUERY = f"SELECT server_id, SUM(score) FROM users GROUP BY server_id ORDER BY SUM(score) DESC LIMIT 5"
+        self.curr.execute(QUERY)
+        server_rows = self.curr.fetchall()
+        if not server_rows:
+            return (False, "No server data available")
+        result = []
+        for rank, server_row in enumerate(server_rows, start=1):
+            id, score = server_row
+            result.append((rank, id, score))
+        return (True, result)
+
     def _change_letter(self, server_id):
 
         word_table = self.get_words_table_name(server_id)
