@@ -213,8 +213,8 @@ class MultiServerWordChainDB:
             self.conn.commit()
             return 1, message
 
-        last_played = datetime.datetime.strptime(last_played[0], "%Y-%m-%d %H:%M:%S")
         streak = last_played[1]
+        last_played = datetime.datetime.strptime(last_played[0], "%Y-%m-%d %H:%M:%S")
         time_now = datetime.datetime.now()
 
         if time_now >= last_played + datetime.timedelta(
