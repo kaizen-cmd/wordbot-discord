@@ -144,7 +144,7 @@ class MultiServerWordChainDB:
         word_in_db, is_word_used = word_result
 
         if is_word_used:
-            return (False, "Word already used", 0, -1, "")
+            return (False, "Word already used", 0)
 
         voting_record = self.curr.execute(
             f"SELECT word_count FROM voting_records WHERE user_id='{player_id}'"
@@ -197,51 +197,46 @@ class MultiServerWordChainDB:
     def update_user_streak(self, server_id, player_id) -> Tuple[int, str]:
         streak, message = -1, ""
         self.curr.execute(
-            "SELECT last_played FROM users WHERE user_id=? AND server_id=?",
+            "SELECT last_played, streak FROM users WHERE user_id=? AND server_id=?",
             (player_id, server_id),
         )
-        last_played = self.curr.fetchone()[0]
-        if not last_played:
+
+        last_played = self.curr.fetchone()
+
+        if not last_played or not last_played[0]:
+            last_played = datetime.datetime.now()
+            message = "New streak started"
             self.curr.execute(
-                "UPDATE users SET last_played=datetime('now') WHERE user_id=? AND server_id=?",
+                "UPDATE users SET streak=1, last_played=datetime('now') WHERE user_id=? AND server_id=?",
                 (player_id, server_id),
             )
+            self.conn.commit()
+            return 1, message
+
+        last_played = datetime.datetime.strptime(last_played[0], "%Y-%m-%d %H:%M:%S")
+        streak = last_played[1]
+        time_now = datetime.datetime.now()
+
+        if time_now >= last_played + datetime.timedelta(
+            days=1
+        ) and time_now < last_played + datetime.timedelta(days=2):
             self.curr.execute(
-                "UPDATE users SET streak=1 WHERE user_id=? AND server_id=?",
+                "UPDATE users SET streak=streak+1, last_played=datetime('now') WHERE user_id=? AND server_id=?",
+                (player_id, server_id),
+            )
+            self.conn.commit()
+            streak += 1
+            message = f"🔥Streak achieved for **{streak}** days🔥"
+
+        elif time_now >= last_played + datetime.timedelta(days=2):
+            self.curr.execute(
+                "UPDATE users SET streak=1, last_played=datetime('now') WHERE user_id=? AND server_id=?",
                 (player_id, server_id),
             )
             self.conn.commit()
             streak = 1
-            message = "You have started a new streak"
-        else:
-            play_time = datetime.datetime.now()
-            last_played = datetime.datetime.strptime(last_played, "%Y-%m-%d %H:%M:%S")
-            if play_time > last_played + datetime.timedelta(
-                days=1
-            ) and play_time < last_played + datetime.timedelta(days=2):
-                self.curr.execute(
-                    "UPDATE users SET streak=streak+1 WHERE user_id=? AND server_id=?",
-                    (player_id, server_id),
-                )
-                self.curr.execute(
-                    "UPDATE users SET last_played=datetime('now') WHERE user_id=? AND server_id=?",
-                    (player_id, server_id),
-                )
-                self.conn.commit()
-                self.curr.execute(
-                    "SELECT streak FROM users WHERE user_id=? AND server_id=?",
-                    (player_id, server_id),
-                )
-                streak = self.curr.fetchone()[0]
-                message = f"🔥Streak achieved for **{streak}** days🔥"
-            elif play_time > last_played + datetime.timedelta(days=2):
-                self.curr.execute(
-                    "UPDATE users SET streak=1, last_played=datetime('now') WHERE user_id=? AND server_id=?",
-                    (player_id, server_id),
-                )
-                self.conn.commit()
-                streak = 1
-                message = "Streak lost. New streak started"
+            message = "Streak broken. Starting a new streak."
+
         return streak, message
 
     def get_score(self, server_id, player_id):

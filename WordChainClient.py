@@ -75,12 +75,11 @@ class WordChainClient(commands.AutoShardedBot):
                 server_id=server.id, word=content, player_id=author.id
             )
 
-            streak_count, streak_message = self.db.update_user_streak(
-                server_id=server.id, player_id=author.id
-            )
-
             coroutines = list()
             if result:
+                streak_count, streak_message = self.db.update_user_streak(
+                    server_id=server.id, player_id=author.id
+                )
                 coroutines.append(
                     message.add_reaction(WordChainClient.POINTS_REACTIONS_MAP[points])
                 )
