@@ -236,7 +236,7 @@ class MultiServerWordChainDB:
                 message = f"🔥Streak achieved for **{streak}** days🔥"
             elif play_time > last_played + datetime.timedelta(days=2):
                 self.curr.execute(
-                    "UPDATE users SET streak=1 WHERE user_id=? AND server_id=?",
+                    "UPDATE users SET streak=1, last_played=datetime('now') WHERE user_id=? AND server_id=?",
                     (player_id, server_id),
                 )
                 self.conn.commit()
