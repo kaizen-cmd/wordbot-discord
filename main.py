@@ -28,8 +28,8 @@ app = App(os.getenv("BOT_TOKEN"), client=client)
 
 
 if __name__ == "__main__":
-    from insights import run
+    # from insights import run
 
-    multiprocessing.Process(target=run).start()
+    # multiprocessing.Process(target=run).start()
     logger.info("Started Wordchain instance")
     app.run()
