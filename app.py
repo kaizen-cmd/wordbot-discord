@@ -1,38 +1,18 @@
-import logging
-import os
-
 import discord
-from dotenv import load_dotenv
 
 from elements import VoteButton
 from WordChainClient import WordChainClient
+from logging_config import get_logger
 
-if ".env" not in os.listdir():
-    raise Exception(".env not found")
-
-load_dotenv(".env")
-
-logging.basicConfig(
-    filename="logs/app.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
-logger = logging.getLogger("app")
+logger = get_logger(__name__)
 
 
 class App:
 
-    def __init__(self, token) -> None:
-        self.CLIENT = self._constrcut_client()
+    def __init__(self, token, client) -> None:
+        self.CLIENT = client
         self.TOKEN = token
         self._add_slash_commands()
-
-    def _constrcut_client(self):
-        intents = discord.Intents.default()
-        intents.messages = True
-        intents.message_content = True
-        return WordChainClient(intents=intents, command_prefix="/")
 
     def _add_slash_commands(self):
 
@@ -210,9 +190,3 @@ class App:
     def run(self):
         logger.info("Running the bot")
         self.CLIENT.run(self.TOKEN)
-
-
-if __name__ == "__main__":
-    app = App(os.getenv("BOT_TOKEN"))
-    logger.info("Started Wordchain instance")
-    app.run()

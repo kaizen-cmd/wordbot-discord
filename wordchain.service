@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/wordbot-discord
-ExecStart=/home/ubuntu/wordbot-discord/venv/bin/python3 /home/ubuntu/wordbot-discord/app.py
+ExecStart=/home/ubuntu/wordbot-discord/venv/bin/python3 /home/ubuntu/wordbot-discord/main.py
 Restart=always
 Environment="BOT_TOKEN=MTIyNTQ5MDc1OTQzMjc5ODMyMA.GBK0hM.7cIV6gluTopYAOsmtbYD0hkvmgChVAeYTWJDdg"
 Environment="SLAV_USER_ID=462682564281499659"

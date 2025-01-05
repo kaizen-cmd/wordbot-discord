@@ -1,16 +1,11 @@
-import logging
+from logging_config import get_logger
 import random
 import sqlite3
 from collections import namedtuple
 import datetime
 from typing import Tuple
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    filename="logs/multiserverwordchaindb.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logger = get_logger(__name__)
 
 
 class MultiServerWordChainDB:
@@ -337,8 +332,8 @@ class MultiServerWordChainDB:
                 )
             self.conn.commit()
 
-    def get_top_servers(self):
-        QUERY = f"SELECT server_id, SUM(score) FROM users GROUP BY server_id ORDER BY SUM(score) DESC LIMIT 5"
+    def get_top_servers(self, limit=5):
+        QUERY = f"SELECT server_id, SUM(score) FROM users GROUP BY server_id ORDER BY SUM(score) DESC LIMIT {limit}"
         self.curr.execute(QUERY)
         server_rows = self.curr.fetchall()
         if not server_rows:

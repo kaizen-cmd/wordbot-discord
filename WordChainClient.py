@@ -1,7 +1,6 @@
 import asyncio
 import json
-import logging
-import logging.handlers
+from logging_config import get_logger
 import os
 
 import discord
@@ -9,14 +8,8 @@ import requests
 from discord.ext import commands
 
 from elements import GamingRefreeEmbed
-from MultiServerWordChainDB import MultiServerWordChainDB
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    filename="logs/wordchainclient.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logger = get_logger(__name__)
 
 
 class WordChainClient(commands.AutoShardedBot):
@@ -32,9 +25,9 @@ class WordChainClient(commands.AutoShardedBot):
         16: "🤑",
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, db, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.db = MultiServerWordChainDB()
+        self.db = db
         # self.shard_count = 2
 
         f = open("server_channel_mapping.json", "r")
