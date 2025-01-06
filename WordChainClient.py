@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from elements import GamingRefreeEmbed
 
+
 logger = get_logger(__name__)
 
 
@@ -25,9 +26,10 @@ class WordChainClient(commands.AutoShardedBot):
         16: "🤑",
     }
 
-    def __init__(self, db, *args, **kwargs):
+    def __init__(self, db, insights, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.db = db
+        self.insights = insights
         # self.shard_count = 2
 
         f = open("server_channel_mapping.json", "r")
@@ -98,6 +100,7 @@ class WordChainClient(commands.AutoShardedBot):
             )
 
         self.db.refresh_words(server_id=server.id)
+        self.insights.send()
 
     async def on_guild_remove(self, server: discord.guild.Guild):
         try:

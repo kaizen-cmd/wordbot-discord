@@ -5,7 +5,7 @@ from MultiServerWordChainDB import MultiServerWordChainDB
 from WordChainClient import WordChainClient
 from app import App
 from logging_config import get_logger
-import multiprocessing
+from insights import Insights
 
 logger = get_logger(__name__)
 
@@ -15,21 +15,22 @@ if ".env" not in os.listdir():
 load_dotenv(".env")
 
 
-def _constrcut_client(db):
+def _constrcut_client(db, insights):
+
     intents = discord.Intents.default()
     intents.messages = True
     intents.message_content = True
-    return WordChainClient(db=db, intents=intents, command_prefix="/")
+    return WordChainClient(
+        db=db, insights=insights, intents=intents, command_prefix="/"
+    )
 
 
 db = MultiServerWordChainDB()
-client = _constrcut_client(db)
+insights = Insights(db)
+client = _constrcut_client(db, insights)
 app = App(os.getenv("BOT_TOKEN"), client=client)
 
 
 if __name__ == "__main__":
-    # from insights import run
-
-    # multiprocessing.Process(target=run).start()
     logger.info("Started Wordchain instance")
     app.run()
