@@ -11,6 +11,8 @@ import os
 
 import requests
 
+import time
+
 f = open("./server_channel_mapping.json", "r")
 server_channel_mapping = json.loads(f.read())
 f.close()
@@ -110,6 +112,7 @@ def broadcast_embed(message="Hello!"):
                 headers=headers,
                 json=data,
             )
+            time.sleep(3)
 
 
 if __name__ == "__main__":

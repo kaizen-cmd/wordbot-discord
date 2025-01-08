@@ -2,8 +2,11 @@ from scripts.send_custom_message import send_embed_to_server
 import datetime
 from logging_config import get_logger
 from elements import GamingRefreeEmbed
+import time
 
 logger = get_logger(__name__)
+
+SERVER_LIMIT = 50
 
 
 class Insights:
@@ -21,11 +24,11 @@ class Insights:
     def refresh_cache(self):
         self.server_rank_map = {
             server_id: (rank, server_id, coins)
-            for rank, server_id, coins in self.db.get_top_servers(limit=15)[1]
+            for rank, server_id, coins in self.db.get_top_servers(limit=SERVER_LIMIT)[1]
         }
 
     def compare_cache_and_send_messages(self):
-        current_top_servers = self.db.get_top_servers(limit=10)[1]
+        current_top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)[1]
 
         for i, server in enumerate(current_top_servers, start=1):
             message = ""
@@ -61,6 +64,7 @@ class Insights:
                 description=message,
             )
             send_embed_to_server(embed.to_dict(), server_id)
+            time.sleep(5)
 
         self.server_rank_map = {
             server_id: (rank, server_id, coins)
