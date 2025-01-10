@@ -15,25 +15,19 @@ class TaskQueue:
         self.queue.put({"target": target, "data": data})
 
     def process_item(self, item):
+        with self.lock:
+            self.in_progress_buffer.append(item)
         if item["target"] == "broadcast_embed":
             broadcast_embed(item["data"])
         elif item["target"] == "broadcast":
             broadcast(item["data"])
+        with self.lock:
+            self.in_progress_buffer.remove(item)
 
     def _start_consumer(self):
         while True:
-            try:
-                item = self.queue.get(timeout=self.timeout)
-                with self.lock:
-                    self.in_progress_buffer.append(item)
-                    print("ip buffer", len(self.in_progress_buffer))
-                try:
-                    self.process_item(item)
-                finally:
-                    with self.lock:
-                        self.in_progress_buffer.remove(item)
-            except Exception as e:
-                print(f"Error: {e}")
+            item = self.queue.get(timeout=self.timeout)
+            self.process_item(item)
             time.sleep(self.sleep_duration)
 
     def start_processing(self):
