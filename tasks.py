@@ -5,6 +5,7 @@ import time
 
 class TaskQueue:
     def __init__(self):
+        print("TaskQueue init")
         self.queue = Queue(maxsize=3)
         self.lock = Lock()
         self.in_progress_buffer = Manager().list()
@@ -15,6 +16,7 @@ class TaskQueue:
         self.queue.put({"target": target, "data": data})
 
     def process_item(self, item):
+        print(f"Processing item {item}")
         with self.lock:
             self.in_progress_buffer.append(item)
         if item["target"] == "broadcast_embed":
@@ -26,8 +28,11 @@ class TaskQueue:
 
     def _start_consumer(self):
         while True:
-            item = self.queue.get(timeout=self.timeout)
-            self.process_item(item)
+            try:
+                item = self.queue.get(timeout=self.timeout)
+                self.process_item(item)
+            except Exception as e:
+                pass
             time.sleep(self.sleep_duration)
 
     def start_processing(self):
@@ -39,5 +44,4 @@ class TaskQueue:
 
     def get_inprogress(self):
         with self.lock:
-            print("ip buffer in get", len(self.in_progress_buffer))
             return self.in_progress_buffer

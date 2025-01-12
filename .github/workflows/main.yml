@@ -1,6 +1,7 @@
 name: Deploy to EC2
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
 jobs:
@@ -24,7 +25,7 @@ jobs:
       - name: SSH to EC2 instance
         uses: appleboy/ssh-action@master
         with:
-          host: 13.201.51.136
+          host: ${{ secrets.AWS_EC2_IP}}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22

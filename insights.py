@@ -15,8 +15,7 @@ class Insights:
         self.server_rank_map = dict()
         self.db = db
 
-        # 2 days, 3 days, 4 days
-        self.intervals = [172800, 259200, 345600]
+        self.interval = 86400
         self.interval_index = 0
         self.last_run = datetime.datetime.now()
         self.refresh_cache()
@@ -74,11 +73,9 @@ class Insights:
     def send(self):
 
         elapsed_time = (datetime.datetime.now() - self.last_run).total_seconds()
-        current_interval = self.intervals[self.interval_index]
 
-        if elapsed_time >= current_interval:
+        if elapsed_time >= self.interval:
             logger.info("Sending insights")
             self.compare_cache_and_send_messages()
 
             self.last_run = datetime.datetime.now()
-            self.interval_index = (self.interval_index + 1) % len(self.intervals)
