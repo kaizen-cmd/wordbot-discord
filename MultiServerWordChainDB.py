@@ -311,7 +311,7 @@ class MultiServerWordChainDB:
 
         if (
             not last_refresh
-            or last_refresh < datetime.datetime.now() - datetime.timedelta(days=7)
+            or last_refresh < datetime.datetime.now() - datetime.timedelta(days=21)
         ):
             logger.info(f"[WORD REFRESH] Refreshing words for server {server_id}")
             self.curr.execute(
@@ -324,9 +324,9 @@ class MultiServerWordChainDB:
                     f"SELECT COUNT(word) FROM {word_table} WHERE word LIKE '{letter}%' AND isUsed=1"
                 )
                 used_words = self.curr.fetchone()[0]
-                limit = int(used_words * 0.4)
+                limit = int(used_words * 0.25)
                 if letter in ("x", "z", "y"):
-                    limit = int(used_words * 0.6)
+                    limit = int(used_words * 0.4)
                 self.curr.execute(
                     f"UPDATE {word_table} SET isUsed=0 WHERE word LIKE '{letter}%' AND isUsed=1 ORDER BY RANDOM() LIMIT {limit}"
                 )
