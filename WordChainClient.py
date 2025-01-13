@@ -99,7 +99,7 @@ class WordChainClient(commands.AutoShardedBot):
                 exc_info=True,
             )
 
-        # self.db.refresh_words(server_id=server.id)
+        self.db.refresh_words(server_id=server.id)
         self.insights.send()
 
     async def on_guild_remove(self, server: discord.guild.Guild):
