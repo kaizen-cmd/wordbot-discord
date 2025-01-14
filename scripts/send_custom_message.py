@@ -12,6 +12,13 @@ import time
 
 import requests
 
+logging.basicConfig(
+    filename="logs/web.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 f = open("./server_channel_mapping.json", "r")
 server_channel_mapping = json.loads(f.read())
 f.close()
@@ -92,26 +99,25 @@ def broadcast(message="Hello!"):
 def broadcast_embed(message="Hello!"):
     global server_channel_mapping
     global headers
-    response = requests.get(
-        "https://discord.com/api/v9/users/@me/guilds", headers=headers
+    server_count = 0
+    success_server_count = 0
+    for server_id, channel_id in server_channel_mapping.items():
+        data = {"embeds": [message]}
+        response = requests.post(
+            f"https://discord.com/api/v9/channels/{channel_id}/messages",
+            headers=headers,
+            json=data,
+        )
+        logger.info(
+            f"#{server_count} Broadcast Embed Status {server_id}: {response.status_code}"
+        )
+        server_count += 1
+        if response.status_code == 200:
+            success_server_count += 1
+        time.sleep(2)
+    logger.info(
+        f"Broadcasted embed stat {success_server_count}/{len(server_channel_mapping)}, {success_server_count/len(server_channel_mapping)*100}%"
     )
-    servers = response.json()
-    for server in servers:
-        server_id = server["id"]
-        channel_id = server_channel_mapping.get(server_id)
-        if channel_id:
-            data = {
-                "embeds": [
-                    message,
-                ]
-            }
-
-            response = requests.post(
-                f"https://discord.com/api/v9/channels/{channel_id}/messages",
-                headers=headers,
-                json=data,
-            )
-            time.sleep(2)
 
 
 if __name__ == "__main__":
