@@ -1,6 +1,7 @@
-from multiprocessing import Process, Queue, Lock, Manager
-from scripts.send_custom_message import broadcast_embed, broadcast
 import time
+from multiprocessing import Lock, Manager, Process, Queue
+
+from scripts.send_custom_message import broadcast, broadcast_embed
 
 
 class TaskQueue:
@@ -10,7 +11,7 @@ class TaskQueue:
         self.lock = Lock()
         self.in_progress_buffer = Manager().list()
         self.timeout = 5  # timeout for get
-        self.sleep_duration = 10
+        self.sleep_duration = 2
 
     def submit(self, target, data):
         self.queue.put({"target": target, "data": data})

@@ -1,6 +1,5 @@
 import asyncio
 import json
-from logging_config import get_logger
 import os
 
 import discord
@@ -8,7 +7,7 @@ import requests
 from discord.ext import commands
 
 from elements import GamingRefreeEmbed
-
+from logging_config import get_logger
 
 logger = get_logger(__name__)
 

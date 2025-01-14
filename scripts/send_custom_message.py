@@ -8,10 +8,9 @@ import argparse
 import json
 import logging
 import os
+import time
 
 import requests
-
-import time
 
 f = open("./server_channel_mapping.json", "r")
 server_channel_mapping = json.loads(f.read())
@@ -112,7 +111,7 @@ def broadcast_embed(message="Hello!"):
                 headers=headers,
                 json=data,
             )
-            time.sleep(3)
+            time.sleep(2)
 
 
 if __name__ == "__main__":

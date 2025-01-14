@@ -1,11 +1,13 @@
 import os
+
 import discord
 from dotenv import load_dotenv
+
+from app import App
+from insights import Insights
+from logging_config import get_logger
 from MultiServerWordChainDB import MultiServerWordChainDB
 from WordChainClient import WordChainClient
-from app import App
-from logging_config import get_logger
-from insights import Insights
 
 logger = get_logger(__name__)
 

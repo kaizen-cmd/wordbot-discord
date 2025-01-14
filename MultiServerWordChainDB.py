@@ -1,9 +1,10 @@
-from logging_config import get_logger
+import datetime
 import random
 import sqlite3
 from collections import namedtuple
-import datetime
 from typing import Tuple
+
+from logging_config import get_logger
 
 logger = get_logger(__name__)
 

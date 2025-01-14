@@ -19,7 +19,7 @@ from tasks import TaskQueue
 
 logging.basicConfig(
     filename="logs/web.log",
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)

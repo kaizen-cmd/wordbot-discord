@@ -1,8 +1,10 @@
+import logging
+
 import discord
 
 from elements import VoteButton
-from WordChainClient import WordChainClient
 from logging_config import get_logger
+from WordChainClient import WordChainClient
 
 logger = get_logger(__name__)
 
@@ -10,7 +12,7 @@ logger = get_logger(__name__)
 class App:
 
     def __init__(self, token, client) -> None:
-        self.CLIENT = client
+        self.CLIENT: WordChainClient = client
         self.TOKEN = token
         self._add_slash_commands()
 
@@ -189,4 +191,4 @@ class App:
 
     def run(self):
         logger.info("Running the bot")
-        self.CLIENT.run(self.TOKEN)
+        self.CLIENT.run(self.TOKEN, log_level=logging.INFO)
