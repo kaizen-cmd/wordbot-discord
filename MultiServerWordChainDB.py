@@ -232,6 +232,15 @@ class MultiServerWordChainDB:
             streak = 1
             message = "Streak broken. Starting a new streak."
 
+        if streak and streak % 20 == 0:
+            multiplier = streak // 20
+            coins = min(300, multiplier * 20)
+            message += f" 🎉🎉🎉 **20 days !!** 🎉🎉🎉 You recieve additional **{coins}** coins 💰 for maintaining the streak"
+            self.curr.execute(
+                "UPDATE users SET score=score+? WHERE user_id=? AND server_id=?",
+                (coins, player_id, server_id),
+            )
+            self.conn.commit()
         return streak, message
 
     def get_score(self, server_id, player_id):
