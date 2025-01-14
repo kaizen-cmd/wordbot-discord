@@ -25,7 +25,7 @@ class TaskQueue:
         self.queue.put({"target": target, "data": data})
 
     def process_item(self, item):
-        logger.info(f"Processing item {item["target"]}")
+        logger.info(f"Processing item {item['target']}")
         with self.lock:
             self.in_progress_buffer.append(item)
         if item["target"] == "broadcast_embed":
