@@ -2,7 +2,7 @@ import logging
 
 import discord
 
-from elements import VoteButton
+from elements import VoteButtonsView
 from logging_config import get_logger
 from WordChainClient import WordChainClient
 
@@ -31,7 +31,7 @@ class App:
                 return
 
             embed = self.CLIENT._activate_bot(interaction.guild, interaction.channel)
-            await interaction.response.send_message(embed=embed, view=VoteButton())
+            await interaction.response.send_message(embed=embed, view=VoteButtonsView())
             logger.info(f"Activated game in server {interaction.guild.name}")
             if (
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
@@ -57,7 +57,7 @@ class App:
                 return
 
             embed = self.CLIENT._deactivate_bot(interaction.guild, interaction.channel)
-            await interaction.response.send_message(embed=embed, view=VoteButton())
+            await interaction.response.send_message(embed=embed, view=VoteButtonsView())
             logger.info(f"Deactivated game in server {interaction.guild.name}")
             if (
                 interaction.guild.id != self.CLIENT.SUPPORT_SERVER_ID
@@ -80,7 +80,7 @@ class App:
             if type(message) == str:
                 await interaction.followup.send(message)
                 return
-            await interaction.followup.send(embed=message, view=VoteButton())
+            await interaction.followup.send(embed=message, view=VoteButtonsView())
 
         @self.CLIENT.tree.command(
             name="vote",
@@ -101,7 +101,7 @@ class App:
             if interaction.user.bot:
                 return
             embed = self.CLIENT.get_help_embed()
-            await interaction.response.send_message(embed=embed, view=VoteButton())
+            await interaction.response.send_message(embed=embed, view=VoteButtonsView())
 
         @self.CLIENT.tree.command(
             name="exhaust",
@@ -137,7 +137,9 @@ class App:
             if type(message) == str:
                 await interaction.response.send_message(message)
                 return
-            await interaction.response.send_message(embed=message, view=VoteButton())
+            await interaction.response.send_message(
+                embed=message, view=VoteButtonsView()
+            )
 
         @self.CLIENT.tree.command(
             name="server_leaderboard",
@@ -153,7 +155,7 @@ class App:
             if type(message) == str:
                 await interaction.followup.send(message)
                 return
-            await interaction.followup.send(embed=message, view=VoteButton())
+            await interaction.followup.send(embed=message, view=VoteButtonsView())
 
         @self.CLIENT.tree.command(
             name="meaning",
@@ -187,7 +189,7 @@ class App:
             if type(message) == str:
                 await interaction.followup.send(message)
                 return
-            await interaction.followup.send(embed=message, view=VoteButton())
+            await interaction.followup.send(embed=message, view=VoteButtonsView())
 
     def run(self):
         logger.info("Running the bot")

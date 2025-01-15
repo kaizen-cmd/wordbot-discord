@@ -239,8 +239,7 @@
           });
       }
 
-      // Call countServers function when the page loads
-      document.onload = fetchServers();
+      document.getElementById("get-server-btn").addEventListener("click", fetchServers);
     </script>
   </head>
   <body>
@@ -336,6 +335,9 @@
       <h3>Total Active Members: <span id="activeMembers"></span></h3>
     </div>
 
+    <div class="container">
+      <button id="get-server-btn">Get Servers</button>
+    </div>
     <div class="container">
       <!-- Search Bar -->
       <div class="search-bar">

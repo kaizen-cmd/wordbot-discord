@@ -47,24 +47,54 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static/", StaticFiles(directory="static"), name="static")
 
 
+def validate_top_gg_webhook(data, headers):
+    # Check for correct authorization
+    if headers.get("Authorization") != "super_secret_password":
+        logger.warning("Unauthorized vote callback attempt")
+        raise Exception("Unauthorized")
+
+    type_ = data["type"]
+    bot = data["bot"]
+
+    if bot != os.getenv("BOT_ID") or type_ != "upvote":
+        raise Exception("Invalid request")
+
+
+def validate_discordbotlist_webhook(data, headers):
+    # Check for correct authorization
+    if headers.get("origin") != "https://discordbotlist.com":
+        raise Exception("Unauthorized")
+
+
 @app.post("/vote-callback")
 async def vote_callback(request: Request):
     logger.info("Received vote callback")
     word_count = 5
 
-    # Check for correct authorization
-    if request.headers.get("Authorization") != "super_secret_password":
-        logger.warning("Unauthorized vote callback attempt")
-        return "Hello World"
-
-    # Fetch the data from the request
     data = await request.json()
-    user_id = int(data["user"])
-    type_ = data["type"]
-    bot = data["bot"]
+    headers = request.headers
 
-    if bot != os.getenv("BOT_ID") or type_ != "upvote":
-        return "Not an upvote request"
+    is_valid = False
+    try:
+        validate_discordbotlist_webhook(data, headers)
+        is_valid = True
+    except Exception as e:
+        logger.warning("Not a discordbotlist call", e)
+
+    try:
+        validate_top_gg_webhook(data, headers)
+        is_valid = True
+    except Exception as e:
+        logger.warning("Not a top.gg call", e)
+
+    if not is_valid:
+        return "Invalid request"
+
+    user_id = int(data.get("user") or data.get("id"))
+
+    if not user_id:
+        logger.warning("Received a vote callback without user id")
+        return "Invalid request"
 
     # Create a new SQLite connection and cursor within the route
     db = sqlite3.connect("db.sqlite3")
