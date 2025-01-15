@@ -125,122 +125,6 @@
         margin-bottom: 10px;
       }
     </style>
-    <script>
-      // Function to filter the server names based on the search input
-      function searchServers() {
-        const input = document.getElementById("serverSearchInput").value.toUpperCase();
-        const table = document.getElementById("serverTable");
-        const tr = table.getElementsByTagName("tr");
-
-        for (let i = 1; i < tr.length; i++) {
-          const td = tr[i].getElementsByTagName("td")[0]; // Get the server name column
-          const activation = tr[i].getElementsByTagName("td")[1]; // Get the server activation status
-
-          if (td) {
-            const textValue = td.textContent || td.innerText;
-            const activationValue = activation.textContent.trim();
-            if (textValue.toUpperCase().indexOf(input) > -1 || activationValue.toUpperCase().indexOf(input) > -1) {
-              tr[i].style.display = "";
-            } else {
-              tr[i].style.display = "none";
-            }
-          }
-        }
-      }
-
-      // Function to count the total number of visible servers
-      function countServers() {
-        const table = document.getElementById("serverTable");
-        const tr = table.getElementsByTagName("tr");
-        let count = 0;
-
-        for (let i = 1; i < tr.length; i++) {
-          if (tr[i].style.display !== "none") {
-            count++;
-          }
-        }
-
-        document.getElementById("totalServers").innerText = count;
-      }
-
-      // Function to sort the table by the member count column
-      let sortOrder = true; // true for ascending, false for descending
-
-      function sortTable() {
-        const table = document.getElementById("serverTable");
-        const rows = Array.from(table.rows).slice(1); // Get all rows except the header
-        const index = 2; // Member count column index
-
-        rows.sort((a, b) => {
-          const aVal = parseInt(a.cells[index].innerText) || 0;
-          const bVal = parseInt(b.cells[index].innerText) || 0;
-
-          return sortOrder ? aVal - bVal : bVal - aVal;
-        });
-
-        // Reattach sorted rows
-        rows.forEach((row) => table.appendChild(row));
-
-        // Toggle sort order
-        sortOrder = !sortOrder;
-      }
-
-      let sortActivationOrder = true; // true for ascending, false for descending
-      function sortActivationColumn() {
-        const table = document.getElementById("serverTable");
-        const rows = Array.from(table.rows).slice(1); // Get all rows except the header
-        const index = 1; // Member count column index
-
-        rows.sort((a, b) => {
-          const aVal = a.cells[index].textContent.trim() === "False" ? 0 : 1;
-          const bVal = b.cells[index].textContent.trim() === "False" ? 0 : 1;
-
-          return sortActivationOrder ? aVal - bVal : bVal - aVal;
-        });
-
-        // Reattach sorted rows
-        rows.forEach((row) => table.appendChild(row));
-
-        // Toggle sort order
-        sortActivationOrder = !sortActivationOrder;
-      }
-
-      function copyServerID(serverID) {
-        navigator.clipboard.writeText(serverID);
-      }
-
-      function fetchServers() {
-        fetch("/servers")
-          .then((response) => response.json())
-          .then((data) => {
-            const table = document.getElementById("serverTable");
-            const tbody = table.getElementsByTagName("tbody")[0];
-            tbody.innerHTML = "";
-
-            data.servers.forEach((server) => {
-              const row = tbody.insertRow();
-              row.innerHTML = `
-                <td onclick="copyServerID('${server.id}')">${server.name}</td>
-                <td>
-                  <div style="width: 15px; height: 15px; background-color: ${
-                    server.activation_status ? "rgb(18, 234, 18)" : "red"
-                  }; margin: 0 auto; color: #00695d00">
-                    ${server.activation_status}
-                  </div>
-                </td>
-                <td>${server.member_count}</td>
-                <td>${server.active_members}</td>
-              `;
-            });
-
-            document.getElementById("activeMembers").innerText = data.active_members;
-
-            countServers();
-          });
-      }
-
-      document.getElementById("get-server-btn").addEventListener("click", fetchServers);
-    </script>
   </head>
   <body>
     {% if inprogress_tasks %}
@@ -382,4 +266,120 @@
       </table>
     </div>
   </body>
+  <script>
+    // Function to filter the server names based on the search input
+    function searchServers() {
+      const input = document.getElementById("serverSearchInput").value.toUpperCase();
+      const table = document.getElementById("serverTable");
+      const tr = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < tr.length; i++) {
+        const td = tr[i].getElementsByTagName("td")[0]; // Get the server name column
+        const activation = tr[i].getElementsByTagName("td")[1]; // Get the server activation status
+
+        if (td) {
+          const textValue = td.textContent || td.innerText;
+          const activationValue = activation.textContent.trim();
+          if (textValue.toUpperCase().indexOf(input) > -1 || activationValue.toUpperCase().indexOf(input) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+
+    // Function to count the total number of visible servers
+    function countServers() {
+      const table = document.getElementById("serverTable");
+      const tr = table.getElementsByTagName("tr");
+      let count = 0;
+
+      for (let i = 1; i < tr.length; i++) {
+        if (tr[i].style.display !== "none") {
+          count++;
+        }
+      }
+
+      document.getElementById("totalServers").innerText = count;
+    }
+
+    // Function to sort the table by the member count column
+    let sortOrder = true; // true for ascending, false for descending
+
+    function sortTable() {
+      const table = document.getElementById("serverTable");
+      const rows = Array.from(table.rows).slice(1); // Get all rows except the header
+      const index = 2; // Member count column index
+
+      rows.sort((a, b) => {
+        const aVal = parseInt(a.cells[index].innerText) || 0;
+        const bVal = parseInt(b.cells[index].innerText) || 0;
+
+        return sortOrder ? aVal - bVal : bVal - aVal;
+      });
+
+      // Reattach sorted rows
+      rows.forEach((row) => table.appendChild(row));
+
+      // Toggle sort order
+      sortOrder = !sortOrder;
+    }
+
+    let sortActivationOrder = true; // true for ascending, false for descending
+    function sortActivationColumn() {
+      const table = document.getElementById("serverTable");
+      const rows = Array.from(table.rows).slice(1); // Get all rows except the header
+      const index = 1; // Member count column index
+
+      rows.sort((a, b) => {
+        const aVal = a.cells[index].textContent.trim() === "False" ? 0 : 1;
+        const bVal = b.cells[index].textContent.trim() === "False" ? 0 : 1;
+
+        return sortActivationOrder ? aVal - bVal : bVal - aVal;
+      });
+
+      // Reattach sorted rows
+      rows.forEach((row) => table.appendChild(row));
+
+      // Toggle sort order
+      sortActivationOrder = !sortActivationOrder;
+    }
+
+    function copyServerID(serverID) {
+      navigator.clipboard.writeText(serverID);
+    }
+
+    function fetchServers() {
+      fetch("/servers")
+        .then((response) => response.json())
+        .then((data) => {
+          const table = document.getElementById("serverTable");
+          const tbody = table.getElementsByTagName("tbody")[0];
+          tbody.innerHTML = "";
+
+          data.servers.forEach((server) => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td onclick="copyServerID('${server.id}')">${server.name}</td>
+                <td>
+                  <div style="width: 15px; height: 15px; background-color: ${
+                    server.activation_status ? "rgb(18, 234, 18)" : "red"
+                  }; margin: 0 auto; color: #00695d00">
+                    ${server.activation_status}
+                  </div>
+                </td>
+                <td>${server.member_count}</td>
+                <td>${server.active_members}</td>
+              `;
+          });
+
+          document.getElementById("activeMembers").innerText = data.active_members;
+
+          countServers();
+        });
+    }
+
+    document.getElementById("get-server-btn").addEventListener("click", fetchServers);
+  </script>
 </html>
