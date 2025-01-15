@@ -1,8 +1,8 @@
+import logging
 import time
 from multiprocessing import Lock, Manager, Process, Queue
 
 from scripts.send_custom_message import broadcast, broadcast_embed
-import logging
 
 logging.basicConfig(
     filename="logs/web.log",

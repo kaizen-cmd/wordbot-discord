@@ -124,6 +124,14 @@
         width: 100%;
         margin-bottom: 10px;
       }
+      .logs {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        max-height: 200px;
+        overflow-y: scroll;
+      }
     </style>
   </head>
   <body>
@@ -175,6 +183,8 @@
         <input type="url" name="image" placeholder="Image" />
         <button type="submit">Broadcast Embed</button>
       </form>
+      <h4>Web Logs</h4>
+      <div class="logs"></div>
     </div>
 
     <div class="container broadcast-section">
@@ -381,5 +391,13 @@
     }
 
     document.getElementById("get-server-btn").addEventListener("click", fetchServers);
+
+    // let ws = WebSocket("wss://gamingrefree.online/ws/logs");
+    let ws = new WebSocket("ws://localhost:8000/ws");
+    ws.onmessage = (event) => {
+      const logs = document.querySelector(".logs");
+      logs.innerHTML += `<p>${event.data}</p>`;
+      logs.scrollTop = logs.scrollHeight;
+    };
   </script>
 </html>

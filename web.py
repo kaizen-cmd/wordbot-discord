@@ -1,13 +1,15 @@
+import asyncio
 import logging
 import os
 import sqlite3
 from collections import namedtuple
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, WebSocketDisconnect
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.websockets import WebSocket
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 
@@ -163,6 +165,25 @@ async def admin_get(request: Request):
             "inprogress_tasks": inprogress_tasks,
         },
     )
+
+
+@app.websocket("/ws")
+async def websocket_logs_endpoint(websocket: WebSocket):
+    logger.info("Websocket connection established")
+    await websocket.accept()
+    if websocket.session.get("authenticated", False) != True:
+        await websocket.close()
+        return
+    with open("logs/web.log", "r") as f:
+        try:
+            while True:
+                line = f.readline()
+                if not line:
+                    await asyncio.sleep(1)
+                    continue
+                await websocket.send_text(line)
+        except WebSocketDisconnect:
+            websocket.close()
 
 
 @app.get("/servers")
