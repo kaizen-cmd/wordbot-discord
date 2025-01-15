@@ -392,8 +392,8 @@
 
     document.getElementById("get-server-btn").addEventListener("click", fetchServers);
 
-    // let ws = WebSocket("wss://gamingrefree.online/ws/logs");
-    let ws = new WebSocket("ws://localhost:8000/ws");
+    let ws = WebSocket("wss://gamingrefree.online/ws/logs");
+    // let ws = new WebSocket("ws://localhost:8000/ws");
     ws.onmessage = (event) => {
       const logs = document.querySelector(".logs");
       logs.innerHTML += `<p>${event.data}</p>`;

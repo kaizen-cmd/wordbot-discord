@@ -90,7 +90,8 @@ class App:
             if interaction.user.bot:
                 return
             await interaction.response.send_message(
-                "Vote on https://top.gg/bot/1225490759432798320 to get double coins 💰 on next 5 accepted words"
+                "- Vote on https://top.gg/bot/1225490759432798320 to get double coins 💰 on next 5 accepted words\n"
+                "- Vote on https://discordbotlist.com/bots/gamingrefree to get double coins 💰 on next 5 accepted words"
             )
 
         @self.CLIENT.tree.command(
