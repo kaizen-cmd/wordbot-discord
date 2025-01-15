@@ -175,6 +175,7 @@ async def websocket_logs_endpoint(websocket: WebSocket):
         await websocket.close()
         return
     with open("logs/web.log", "r") as f:
+        f.readlines()
         try:
             while True:
                 line = f.readline()
