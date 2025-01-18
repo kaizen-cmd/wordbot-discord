@@ -198,10 +198,9 @@ class MultiServerWordChainDB:
             (player_id, server_id),
         )
 
-        last_played = self.curr.fetchone()
+        user_row = self.curr.fetchone()
 
-        if not last_played or not last_played[0]:
-            last_played = datetime.datetime.now()
+        if not user_row or not user_row[0]:
             message = "New streak started"
             self.curr.execute(
                 "UPDATE users SET streak=1, last_played=datetime('now') WHERE user_id=? AND server_id=?",
@@ -210,7 +209,7 @@ class MultiServerWordChainDB:
             self.conn.commit()
             return 1, message
 
-        streak = last_played[1]
+        streak = user_row[1]
         last_played = datetime.datetime.strptime(last_played[0], "%Y-%m-%d %H:%M:%S")
         time_now = datetime.datetime.now()
 
@@ -235,11 +234,7 @@ class MultiServerWordChainDB:
             message = "Streak broken. Starting a new streak."
 
         streak_bonus_period = 1
-        if (
-            streak
-            and streak % streak_bonus_period == 0
-            and not last_played[2] == streak
-        ):
+        if streak and streak % streak_bonus_period == 0 and not user_row[2] == streak:
             multiplier = streak // streak_bonus_period
             coins = min(300, multiplier * streak_bonus_period)
             message += f" 🎉🎉🎉 **20 days !!** 🎉🎉🎉 You recieve additional **{coins}** coins 💰 for maintaining the streak"
