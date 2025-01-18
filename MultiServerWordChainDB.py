@@ -233,7 +233,7 @@ class MultiServerWordChainDB:
             streak = 1
             message = "Streak broken. Starting a new streak."
 
-        streak_bonus_period = 1
+        streak_bonus_period = 20
         if streak and streak % streak_bonus_period == 0 and not user_row[2] == streak:
             multiplier = streak // streak_bonus_period
             coins = min(300, multiplier * streak_bonus_period)
