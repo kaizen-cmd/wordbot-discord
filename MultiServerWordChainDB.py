@@ -22,6 +22,7 @@ class MultiServerWordChainDB:
         self._create_voting_record_table()
         self._create_words_refresh_table()
         self._alter_users_table_for_streak_and_last_played()
+        self._alter_users_table_for_streak_bonus_message_sent_column()
 
     def __del__(self):
         self.curr.close()
@@ -193,7 +194,7 @@ class MultiServerWordChainDB:
     def update_user_streak(self, server_id, player_id) -> Tuple[int, str]:
         streak, message = -1, ""
         self.curr.execute(
-            "SELECT last_played, streak FROM users WHERE user_id=? AND server_id=?",
+            "SELECT last_played, streak, streak_bonus_message_sent FROM users WHERE user_id=? AND server_id=?",
             (player_id, server_id),
         )
 
@@ -233,13 +234,18 @@ class MultiServerWordChainDB:
             streak = 1
             message = "Streak broken. Starting a new streak."
 
-        if streak and streak % 20 == 0:
-            multiplier = streak // 20
-            coins = min(300, multiplier * 20)
+        streak_bonus_period = 1
+        if (
+            streak
+            and streak % streak_bonus_period == 0
+            and not last_played[2] == streak
+        ):
+            multiplier = streak // streak_bonus_period
+            coins = min(300, multiplier * streak_bonus_period)
             message += f" 🎉🎉🎉 **20 days !!** 🎉🎉🎉 You recieve additional **{coins}** coins 💰 for maintaining the streak"
             self.curr.execute(
-                "UPDATE users SET score=score+? WHERE user_id=? AND server_id=?",
-                (coins, player_id, server_id),
+                "UPDATE users SET score=score+?, streak_bonus_message_sent=? WHERE user_id=? AND server_id=?",
+                (coins, streak, player_id, server_id),
             )
             self.conn.commit()
         return streak, message
@@ -392,4 +398,13 @@ class MultiServerWordChainDB:
             self.curr.execute("SELECT last_played FROM users")
         except sqlite3.OperationalError:
             self.curr.execute("ALTER TABLE users ADD COLUMN last_played TIMESTAMP ")
+            self.conn.commit()
+
+    def _alter_users_table_for_streak_bonus_message_sent_column(self):
+        try:
+            self.curr.execute("SELECT streak_bonus_message_sent FROM users")
+        except sqlite3.OperationalError:
+            self.curr.execute(
+                "ALTER TABLE users ADD COLUMN streak_bonus_message_sent INTEGER DEFAULT 0"
+            )
             self.conn.commit()
