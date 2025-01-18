@@ -210,7 +210,7 @@ class MultiServerWordChainDB:
             return 1, message
 
         streak = user_row[1]
-        last_played = datetime.datetime.strptime(last_played[0], "%Y-%m-%d %H:%M:%S")
+        last_played = datetime.datetime.strptime(user_row[0], "%Y-%m-%d %H:%M:%S")
         time_now = datetime.datetime.now()
 
         if time_now >= last_played + datetime.timedelta(
