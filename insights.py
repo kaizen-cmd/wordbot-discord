@@ -74,9 +74,10 @@ class Insights:
     def send(self):
 
         elapsed_time = (datetime.datetime.now() - self.last_run).total_seconds()
+        return
 
         if elapsed_time >= self.interval:
             logger.info("Sending insights")
+            self.last_run = datetime.datetime.now()
             self.compare_cache_and_send_messages()
 
-            self.last_run = datetime.datetime.now()
