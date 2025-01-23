@@ -5,6 +5,8 @@ from elements import GamingRefreeEmbed
 from logging_config import get_logger
 from scripts.send_custom_message import send_embed_to_server
 
+import threading
+
 logger = get_logger(__name__)
 
 SERVER_LIMIT = 50
@@ -27,8 +29,7 @@ class Insights:
             for rank, server_id, coins in self.db.get_top_servers(limit=SERVER_LIMIT)[1]
         }
 
-    def compare_cache_and_send_messages(self):
-        current_top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)[1]
+    def compare_cache_and_send_messages(self, current_top_servers=None):
 
         for i, server in enumerate(current_top_servers, start=1):
             message = ""
@@ -74,10 +75,11 @@ class Insights:
     def send(self):
 
         elapsed_time = (datetime.datetime.now() - self.last_run).total_seconds()
-        return
 
         if elapsed_time >= self.interval:
             logger.info("Sending insights")
             self.last_run = datetime.datetime.now()
-            self.compare_cache_and_send_messages()
-
+            current_top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)[1]
+            threading.Thread(
+                target=self.compare_cache_and_send_messages, args=(current_top_servers,)
+            ).start()
