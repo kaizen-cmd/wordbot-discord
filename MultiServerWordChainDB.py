@@ -260,7 +260,11 @@ class MultiServerWordChainDB:
             "SELECT streak FROM users WHERE user_id=? AND server_id=? LIMIT 1",
             (player_id, server_id),
         )
-        streak = self.curr.fetchone()[0] or 0
+        streak = self.curr.fetchone()
+        if streak:
+            streak = streak[0]
+        else:
+            streak = 0
         return streak
 
     def leaderboard(self, server_id):
