@@ -23,6 +23,7 @@ class MultiServerWordChainDB:
         self._create_words_refresh_table()
         self._alter_users_table_for_streak_and_last_played()
         self._alter_users_table_for_streak_bonus_message_sent_column()
+        self._create_admin_creds_if_not_exists()
 
     def __del__(self):
         self.curr.close()
@@ -256,10 +257,14 @@ class MultiServerWordChainDB:
 
     def get_streak_count(self, server_id, player_id):
         self.curr.execute(
-            "SELECT streak FROM users WHERE user_id=? AND server_id=?",
+            "SELECT streak FROM users WHERE user_id=? AND server_id=? LIMIT 1",
             (player_id, server_id),
         )
-        streak = self.curr.fetchone()[0]
+        streak = self.curr.fetchone()
+        if streak:
+            streak = streak[0]
+        else:
+            streak = 0
         return streak
 
     def leaderboard(self, server_id):
@@ -403,3 +408,9 @@ class MultiServerWordChainDB:
                 "ALTER TABLE users ADD COLUMN streak_bonus_message_sent INTEGER DEFAULT 0"
             )
             self.conn.commit()
+
+    def _create_admin_creds_if_not_exists(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS admin_creds(username VARCHAR(255), password VARCHAR(255))"
+        )
+        self.conn.commit()

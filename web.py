@@ -224,7 +224,14 @@ async def admin_post(
     request: Request, username: str = Form(...), password: str = Form(...)
 ):
     logger.info("Admin login attempt")
-    if username == "slav" and password == "Konnichiwa@11Hajimimashte@11":
+    conn = sqlite3.connect("db.sqlite3")
+    curr = conn.cursor()
+    curr.execute("SELECT * FROM admin_creds LIMIT 1")
+    admin_creds = curr.fetchone()
+    curr.close()
+    conn.close()
+    username_, password_ = admin_creds
+    if username == username_ and password == password_:
         request.session["authenticated"] = True
     return RedirectResponse("/admin", status_code=303)
 

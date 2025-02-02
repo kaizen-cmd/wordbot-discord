@@ -7,6 +7,12 @@ on:
     types: [closed]
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
 jobs:
   deploy:
     runs-on: ubuntu-22.04
