@@ -34,6 +34,7 @@ jobs:
           script: |
             sudo apt-get install libpq-dev python3-dev -y
             cd /home/ubuntu/wordbot-discord
+            git checkout -- .
             git pull origin main
 
             sed -i "s/BOT_TOKEN_VALUE/${{ secrets.BOT_TOKEN }}/g" web.service
