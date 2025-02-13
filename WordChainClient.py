@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from dotenv import load_dotenv
 
 import discord
 import requests
@@ -8,6 +9,8 @@ from discord.ext import commands
 
 from elements import GamingRefreeEmbed
 from logging_config import get_logger
+
+load_dotenv(".env")
 
 logger = get_logger(__name__)
 

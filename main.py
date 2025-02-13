@@ -16,7 +16,6 @@ if ".env" not in os.listdir():
 
 load_dotenv(".env")
 
-
 def _constrcut_client(db, insights):
 
     intents = discord.Intents.default()
@@ -26,12 +25,10 @@ def _constrcut_client(db, insights):
         db=db, insights=insights, intents=intents, command_prefix="/"
     )
 
-
 db = MultiServerWordChainDB()
 insights = Insights(db)
 client = _constrcut_client(db, insights)
 app = App(os.getenv("BOT_TOKEN"), client=client)
-
 
 if __name__ == "__main__":
     logger.info("Started Wordchain instance")

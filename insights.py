@@ -24,9 +24,15 @@ class Insights:
         self.refresh_cache()
 
     def refresh_cache(self):
+        top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)
+        if not top_servers[0]:
+            logger.warning("No server data available for insights")
+            self.server_rank_map = {}
+            return
+            
         self.server_rank_map = {
             server_id: (rank, server_id, coins)
-            for rank, server_id, coins in self.db.get_top_servers(limit=SERVER_LIMIT)[1]
+            for rank, server_id, coins in top_servers[1]
         }
 
     def compare_cache_and_send_messages(self, current_top_servers=None):

@@ -19,6 +19,7 @@ class MultiServerWordChainDB:
         self.marks_for_word_length_lte_seven = 4
         self.marks_for_same_start_end_word = 2
         self.char_list = list("abcdefghijklmnopqrstuvwxyz")
+        self._create_users_table()
         self._create_voting_record_table()
         self._create_words_refresh_table()
         self._alter_users_table_for_streak_and_last_played()
@@ -46,10 +47,6 @@ class MultiServerWordChainDB:
         self.curr.execute(
             f"CREATE TABLE IF NOT EXISTS {word_table}(word text primary key, isUsed integer default 0)"
         )
-        self.curr.execute(
-            f"CREATE TABLE IF NOT EXISTS users(id integer primary key, user_id varchar(255), score integer default 0, server_id varchar(255))"
-        )
-
         self.curr.execute(
             f"INSERT INTO lu(last_char, last_user_id, server_id) VALUES('', 0, '{server_id}')"
         )
@@ -376,6 +373,12 @@ class MultiServerWordChainDB:
                 )
                 self.conn.commit()
                 return i
+
+    def _create_users_table(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS users(id integer primary key, user_id varchar(255), score integer default 0, server_id varchar(255), streak integer default 0, last_played timestamp default null, streak_bonus_message_sent boolean default false)"
+        )
+        self.conn.commit()
 
     def _create_voting_record_table(self):
         self.curr.execute(

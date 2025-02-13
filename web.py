@@ -39,7 +39,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-# Add session middleware for managing sessions
 app.add_middleware(SessionMiddleware, secret_key="1qaz2wsx3edc4rfv")
 
 # Set up templates
