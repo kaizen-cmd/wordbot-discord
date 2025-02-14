@@ -1,12 +1,5 @@
 name: Deploy to EC2
 on:
-  # push:
-  #   branches:
-  #     - main
-  pull_request:
-    types: [closed]
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       branch:
@@ -41,7 +34,21 @@ jobs:
           script: |
             sudo apt-get install libpq-dev python3-dev -y
             cd /home/ubuntu/wordbot-discord
+            git checkout -- .
             git pull origin main
+
+            sed -i "s/BOT_TOKEN_VALUE/${{ secrets.BOT_TOKEN }}/g" web.service
+            sed -i "s/SLAV_USER_ID_VALUE/${{ secrets.SLAV_USER_ID }}/g" web.service
+            sed -i "s/SUPPORT_SERVER_ID_VALUE/${{ secrets.SUPPORT_SERVER_ID }}/g" web.service
+            sed -i "s/SUPPORT_SERVER_LOG_CHANNEL_ID_VALUE/${{ secrets.SUPPORT_SERVER_LOG_CHANNEL_ID }}/g" web.service
+            sed -i "s/BOT_ID_VALUE/${{ secrets.BOT_ID }}/g" web.service
+
+            sed -i "s/BOT_TOKEN_VALUE/${{ secrets.BOT_TOKEN }}/g" wordchain.service
+            sed -i "s/SLAV_USER_ID_VALUE/${{ secrets.SLAV_USER_ID }}/g" wordchain.service
+            sed -i "s/SUPPORT_SERVER_ID_VALUE/${{ secrets.SUPPORT_SERVER_ID }}/g" wordchain.service
+            sed -i "s/SUPPORT_SERVER_LOG_CHANNEL_ID_VALUE/${{ secrets.SUPPORT_SERVER_LOG_CHANNEL_ID }}/g" wordchain.service
+            sed -i "s/BOT_ID_VALUE/${{ secrets.BOT_ID }}/g" web.service
+
             sudo cp wordchain.service /etc/systemd/system/wordchain.service
             sudo cp web.service /etc/systemd/system/web.service
             mkdir -p logs

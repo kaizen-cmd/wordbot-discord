@@ -238,7 +238,7 @@ class MultiServerWordChainDB:
         if streak and streak % streak_bonus_period == 0 and not user_row[2] == streak:
             multiplier = streak // streak_bonus_period
             coins = min(300, multiplier * streak_bonus_period)
-            message += f" 🎉🎉🎉 **20 days !!** 🎉🎉🎉 You recieve additional **{coins}** coins 💰 for maintaining the streak"
+            message += f" 🎉🎉🎉 **{streak} days !!** 🎉🎉🎉 You recieve additional **{coins}** coins 💰 for maintaining the streak"
             self.curr.execute(
                 "UPDATE users SET score=score+?, streak_bonus_message_sent=? WHERE user_id=? AND server_id=?",
                 (coins, streak, player_id, server_id),

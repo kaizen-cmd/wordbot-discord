@@ -7,11 +7,11 @@ User=ubuntu
 WorkingDirectory=/home/ubuntu/wordbot-discord
 ExecStart=/home/ubuntu/wordbot-discord/venv/bin/python3 /home/ubuntu/wordbot-discord/main.py
 Restart=always
-Environment="BOT_TOKEN=MTIyNTQ5MDc1OTQzMjc5ODMyMA.GBK0hM.7cIV6gluTopYAOsmtbYD0hkvmgChVAeYTWJDdg"
-Environment="SLAV_USER_ID=462682564281499659"
-Environment="SUPPORT_SERVER_ID=1234116258186657872"
-Environment="SUPPORT_SERVER_LOG_CHANNEL_ID=1236196728613371966"
-Environment="BOT_ID=1225490759432798320"
+Environment="BOT_TOKEN=BOT_TOKEN_VALUE"
+Environment="SLAV_USER_ID=SLAV_USER_ID_VALUE"
+Environment="SUPPORT_SERVER_ID=SUPPORT_SERVER_ID_VALUE"
+Environment="SUPPORT_SERVER_LOG_CHANNEL_ID=SUPPORT_SERVER_LOG_CHANNEL_ID_VALUE"
+Environment="BOT_ID=BOT_ID_VALUE"
 
 [Install]
 WantedBy=multi-user.target
