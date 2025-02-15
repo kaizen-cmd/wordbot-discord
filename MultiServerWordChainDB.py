@@ -19,11 +19,15 @@ class MultiServerWordChainDB:
         self.marks_for_word_length_lte_seven = 4
         self.marks_for_same_start_end_word = 2
         self.char_list = list("abcdefghijklmnopqrstuvwxyz")
+
+        # TODO: Use a database migrations framework
+        self._create_admin_creds_if_not_exists()
+        self._create_users_table()
+        self._create_lu_table()
         self._create_voting_record_table()
         self._create_words_refresh_table()
         self._alter_users_table_for_streak_and_last_played()
         self._alter_users_table_for_streak_bonus_message_sent_column()
-        self._create_admin_creds_if_not_exists()
 
     def __del__(self):
         self.curr.close()
@@ -45,9 +49,6 @@ class MultiServerWordChainDB:
 
         self.curr.execute(
             f"CREATE TABLE IF NOT EXISTS {word_table}(word text primary key, isUsed integer default 0)"
-        )
-        self.curr.execute(
-            f"CREATE TABLE IF NOT EXISTS users(id integer primary key, user_id varchar(255), score integer default 0, server_id varchar(255))"
         )
 
         self.curr.execute(
@@ -353,12 +354,24 @@ class MultiServerWordChainDB:
         self.curr.execute(QUERY)
         server_rows = self.curr.fetchall()
         if not server_rows:
-            return (False, "No server data available")
+            return (False, "No data found")
         result = []
         for rank, server_row in enumerate(server_rows, start=1):
             id, score = server_row
             result.append((rank, id, score))
         return (True, result)
+
+    def _create_users_table(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS users(id integer primary key, user_id varchar(255), score integer default 0, server_id varchar(255))"
+        )
+        self.conn.commit()
+
+    def _create_lu_table(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS lu(last_char VARCHAR(255), last_user_id VARCHAR(255), server_id VARCHAR(255), id INTEGER PRIMARY KEY)"
+        )
+        self.conn.commit()
 
     def _change_letter(self, server_id):
 

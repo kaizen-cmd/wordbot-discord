@@ -3,6 +3,16 @@ import os
 import discord
 from dotenv import load_dotenv
 
+
+def _create_server_channel_mapping_json():
+    if os.path.exists("server_channel_mapping.json"):
+        return
+    with open("server_channel_mapping.json", "w") as f:
+        f.write("{}")
+
+
+_create_server_channel_mapping_json()
+
 from app import App
 from insights import Insights
 from logging_config import get_logger

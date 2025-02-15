@@ -24,9 +24,12 @@ class Insights:
         self.refresh_cache()
 
     def refresh_cache(self):
+        result, top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)
+        if not result:
+            return
         self.server_rank_map = {
             server_id: (rank, server_id, coins)
-            for rank, server_id, coins in self.db.get_top_servers(limit=SERVER_LIMIT)[1]
+            for rank, server_id, coins in top_servers
         }
 
     def compare_cache_and_send_messages(self, current_top_servers=None):
@@ -79,7 +82,9 @@ class Insights:
         if elapsed_time >= self.interval:
             logger.info("Sending insights")
             self.last_run = datetime.datetime.now()
-            current_top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)[1]
+            result, current_top_servers = self.db.get_top_servers(limit=SERVER_LIMIT)
+            if not result:
+                return
             threading.Thread(
                 target=self.compare_cache_and_send_messages, args=(current_top_servers,)
             ).start()
