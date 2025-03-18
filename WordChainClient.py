@@ -3,8 +3,8 @@ import json
 import os
 
 import discord
-import requests
 from discord.ext import commands
+import aiohttp
 
 from elements import GamingRefreeEmbed
 from logging_config import get_logger
@@ -260,16 +260,17 @@ class WordChainClient(commands.AutoShardedBot):
         embed.set_thumbnail(url=author.avatar.url if author.avatar else None)
         return embed
 
-    def _send_meaning(self, word: str):
+    async def _send_meaning(self, word: str):
         if word.isalpha():
-            response = requests.get(
+            client = aiohttp.client.ClientSession()
+            response = await client.get(
                 f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
             )
-            if response.status_code == 400:
+            if response.status == 400:
                 return f"The language expert is not avaialable at the moment"
 
             try:
-                meaning = response.json()[0]["meanings"][0]["definitions"][0][
+                meaning = (await response.json())[0]["meanings"][0]["definitions"][0][
                     "definition"
                 ]
                 embed = GamingRefreeEmbed(title=f"Meaning of the word {word}")

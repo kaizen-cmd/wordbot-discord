@@ -317,6 +317,8 @@ class MultiServerWordChainDB:
         return VotingRecord(voting_record[0], voting_record[1])
 
     def refresh_words(self, server_id):
+        # TODO: Refactor for proper working
+        return
         last_refresh = self.curr.execute(
             f"SELECT timestamp FROM words_refresh WHERE server_id='{server_id}'"
         ).fetchone()

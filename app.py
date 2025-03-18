@@ -165,7 +165,7 @@ class App:
         async def meaning(interaction: discord.Interaction, word: str):
             if interaction.user.bot:
                 return
-            message = self.CLIENT._send_meaning(word)
+            message = await self.CLIENT._send_meaning(word)
             if type(message) == str:
                 await interaction.response.send_message(message)
                 return
