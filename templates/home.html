@@ -4,41 +4,70 @@
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="WordChain: A fun, interactive word game and mini-games bot for 5000+ Discord servers. Compete for coins, climb leaderboards, and unlock rewards!" />
-    <meta name="keywords" content="WordChain, Discord bot, word games, mini-games, leaderboards, coins, invite bot" />
+      content="WordChain: A fun, interactive word game and mini-games bot for 5000+ Discord servers. Compete for coins, climb leaderboards, and unlock rewards!"
+    />
+    <meta
+      name="keywords"
+      content="WordChain, Discord bot, word games, mini-games, leaderboards, coins, invite bot"
+    />
     <meta name="author" content="Tejas" />
 
     <!-- OpenGraph Meta Tags -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="GamingRefree - Best WordChain And MiniGames Bot" />
+    <meta
+      property="og:title"
+      content="GamingRefree - Best WordChain And MiniGames Bot"
+    />
     <meta
       property="og:description"
-      content="Join over 5000 servers playing WordChain! Play word games, earn coins, and enjoy mini-games with your friends." />
-    <meta property="og:image" content="{{request.url_for('static', path='bot.gif')}}" />
+      content="Join over 5000 servers playing WordChain! Play word games, earn coins, and enjoy mini-games with your friends."
+    />
+    <meta
+      property="og:image"
+      content="{{request.url_for('static', path='bot.gif')}}"
+    />
     <meta property="og:url" content="https://gamingrefree.online" />
     <meta property="og:site_name" content="GamingRefree Bot" />
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@GamingRefree" />
-    <meta name="twitter:title" content="GamingRefree - The Best WordChain And MiniGames Bot" />
+    <meta
+      name="twitter:title"
+      content="GamingRefree - The Best WordChain And MiniGames Bot"
+    />
     <meta
       name="twitter:description"
-      content="Compete in word games, earn coins, climb leaderboards, and unlock in-game rewards! Invite the bot to your server today." />
-    <meta name="twitter:image" content="{{request.url_for('static', path='bot.gif')}}" />
+      content="Compete in word games, earn coins, climb leaderboards, and unlock in-game rewards! Invite the bot to your server today."
+    />
+    <meta
+      name="twitter:image"
+      content="{{request.url_for('static', path='bot.gif')}}"
+    />
 
     <!-- Discord Embed Meta Tags -->
     <meta property="og:title" content="GamingRefree Bot" />
-    <meta property="og:description" content="WordChain and mini-games bot for 5000+ Discord servers. Join the fun!" />
-    <meta property="og:image" content="{{request.url_for('static', path='bot.gif')}}" />
+    <meta
+      property="og:description"
+      content="WordChain and mini-games bot for 5000+ Discord servers. Join the fun!"
+    />
+    <meta
+      property="og:image"
+      content="{{request.url_for('static', path='bot.gif')}}"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-      rel="stylesheet" />
+      rel="stylesheet"
+    />
     <title>GamingRefree | Best Discord Bot</title>
-    <link rel="shortcut icon" href="{{request.url_for('static', path='bot.gif')}}" type="image/x-icon" />
+    <link
+      rel="shortcut icon"
+      href="{{request.url_for('static', path='bot.gif')}}"
+      type="image/x-icon"
+    />
   </head>
   <style>
     body {
@@ -147,20 +176,28 @@
           <img src="{{request.url_for('static', path='bot.gif')}}" />
         </div>
         <div id="headline">
-          <h1>Compete in the discord's best wordchain against 1 million members</h1>
+          <h1>
+            Compete in the discord's best wordchain against 1 million members
+          </h1>
         </div>
         <div id="short-desc">
           <p>
-            Participate in a fun, interactive word game and crush other servers by teaming up with your discord firends.
-            Compete for coins, climb leaderboards, and unlock rewards!
+            Participate in a fun, interactive word game and crush other servers
+            by teaming up with your discord firends. Compete for coins, climb
+            leaderboards, and unlock rewards!
           </p>
         </div>
         <div id="buttons">
-          <a href="https://discord.com/oauth2/authorize?client_id=1225490759432798320&scope=bot" target="_blank">
+          <a
+            href="https://discord.com/oauth2/authorize?client_id=1225490759432798320&scope=bot"
+            target="_blank"
+          >
             <button style="margin-right: 10px">Invite To Your Server →</button>
           </a>
           <a href="https://top.gg/bot/1225490759432798320" target="_blank">
-            <button style="background-color: #4a4a4a">Features & Voting Rewards</button>
+            <button style="background-color: #4a4a4a">
+              Features & Voting Rewards
+            </button>
           </a>
         </div>
       </div>
@@ -205,11 +242,34 @@
         currentLineElem.childNodes[
           currentImageCount
         ].childNodes[0].src = `https://cdn.discordapp.com/icons/${parsedData["id"]}/${parsedData["icons"]}.webp?size=256`;
-        currentLineElem.childNodes[currentImageCount].childNodes[0].alt = parsedData["name"];
+        currentLineElem.childNodes[currentImageCount].childNodes[0].alt =
+          parsedData["name"];
         currentImageCount = imgPos[Math.floor(Math.random() * 4)];
         currentLine = Math.floor(Math.random() * 4);
         ci = (ci + 1) % data.length;
       }, 500);
     </script>
   </body>
+  <footer>
+    <div
+      style="
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        color: white !important;
+      "
+    >
+      <div>
+        <a style="color: white" href="/refund">Refund policy</a>
+      </div>
+      <div>
+        <a style="color: white" href="/privacy">Privacy policy</a>
+      </div>
+      <div>
+        <a style="color: white" href="/tos">Terms & Conditions</a>
+      </div>
+      <span>GamingRefree 2025</span>
+    </div>
+  </footer>
 </html>

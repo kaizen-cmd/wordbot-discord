@@ -151,6 +151,21 @@ async def home(request: Request):
     )
 
 
+@app.get("/refund")
+async def home(request: Request):
+    return templates.TemplateResponse("refund.html", {"request": request})
+
+
+@app.get("/privacy")
+async def home(request: Request):
+    return templates.TemplateResponse("privacy.html", {"request": request})
+
+
+@app.get("/tos")
+async def home(request: Request):
+    return templates.TemplateResponse("tandc.html", {"request": request})
+
+
 @app.get("/admin")
 async def admin_get(request: Request):
     if not request.session.get("authenticated"):
