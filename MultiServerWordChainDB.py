@@ -28,6 +28,7 @@ class MultiServerWordChainDB:
         self._create_words_refresh_table()
         self._alter_users_table_for_streak_and_last_played()
         self._alter_users_table_for_streak_bonus_message_sent_column()
+        self._create_subscription_table()
 
     def __del__(self):
         self.curr.close()
@@ -427,5 +428,11 @@ class MultiServerWordChainDB:
     def _create_admin_creds_if_not_exists(self):
         self.curr.execute(
             "CREATE TABLE IF NOT EXISTS admin_creds(username VARCHAR(255), password VARCHAR(255))"
+        )
+        self.conn.commit()
+
+    def _create_subscription_table(self):
+        self.curr.execute(
+            "CREATE TABLE IF NOT EXISTS subscription(user_id VARCHAR(255), subscription_end_date TIMESTAMP)"
         )
         self.conn.commit()

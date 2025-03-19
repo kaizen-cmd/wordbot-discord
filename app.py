@@ -11,6 +11,10 @@ logger = get_logger(__name__)
 
 class App:
 
+    REDIRECT_URL = "https://gamingrefree.online"
+    DODO_URL = "https://checkout.dodopayments.com"
+    PRODUCT_ID = "pdt_TNqrM2HoN2EEOxyemR1mY"
+
     def __init__(self, token, client) -> None:
         self.CLIENT: WordChainClient = client
         self.TOKEN = token
@@ -191,6 +195,21 @@ class App:
                 await interaction.followup.send(message)
                 return
             await interaction.followup.send(embed=message, view=VoteButtonsView())
+
+        @self.CLIENT.tree.command(
+            name="buy_premium", description="Buy premium for the GamingRefree bot"
+        )
+        async def buy_premium(interaction: discord.Interaction):
+            if interaction.user.bot:
+                return
+            user_id = interaction.user.id
+            username = interaction.user.name
+            message = (
+                f"This is the unique subscription link for **{username}**\n"
+                f"[Subscription payment | {username}]({App.DODO_URL}/buy/{App.PRODUCT_ID}?quantity=1&r"
+                f"edirect_url={App.REDIRECT_URL}&metadata_discordUserId={user_id})"
+            )
+            await interaction.response.send_message(message)
 
     def run(self):
         logger.info("Running the bot")
