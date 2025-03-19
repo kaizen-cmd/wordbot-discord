@@ -174,30 +174,36 @@ async def home(request: Request):
     body = await request.body()
     data = json.loads(body.decode("utf-8"))
     event = data["type"]
-    if event in ("subscription.active", "subscription.renewed"):
-        expiry_date = data["data"]["next_billing_date"]
-        discord_user_id = data["data"]["metadata"]["discordUserId"]
-        db = sqlite3.connect("db.sqlite3")
-        curr = db.cursor()
-        dt = datetime.datetime.strptime(expiry_date, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
-            tzinfo=datetime.timezone.utc
-        )
-        sqlite_timestamp = dt.strftime("%Y-%m-%d %H:%M:%S.%f")
-        curr.execute(
-            "INSERT INTO subscription(user_id, subscription_end_date) VALUES (?, ?)",
-            (
-                discord_user_id,
-                sqlite_timestamp,
-            ),
-        )
-        db.commit()
-        curr.close()
-        db.close()
-        channel_id = create_dm_channel(discord_user_id)
-        send_dm(
-            channel_id,
-            f"Thanks for subscribing to premium, your subscription will expire on {expiry_date}",
-        )
+    if not event in ("subscription.active", "subscription.renewed"):
+        return Response(status_code=200)
+    expiry_date = data["data"]["next_billing_date"]
+    discord_user_id = data["data"]["metadata"]["discordUserId"]
+    db = sqlite3.connect("db.sqlite3")
+    curr = db.cursor()
+    dt = datetime.datetime.strptime(expiry_date, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+        tzinfo=datetime.timezone.utc
+    )
+    sqlite_timestamp = dt.strftime("%Y-%m-%d %H:%M:%S.%f")
+    curr.execute(
+        "INSERT INTO subscription(user_id, subscription_end_date) VALUES (?, ?)",
+        (
+            discord_user_id,
+            sqlite_timestamp,
+        ),
+    )
+    db.commit()
+    curr.close()
+    db.close()
+    channel_id = create_dm_channel(discord_user_id)
+    send_dm(
+        channel_id,
+        f"Thanks for subscribing to premium, your subscription will expire on {expiry_date}",
+    )
+    channel_id = create_dm_channel(os.getenv("SLAV_USER_ID"))
+    send_dm(
+        channel_id,
+        f"Someone Subscribed!",
+    )
     return Response(status_code=200)
 
 
