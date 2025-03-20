@@ -1,5 +1,5 @@
 """
-CLI Usage 
+CLI Usage
 python send_custom_message.py broadcast --message "Your message here"
 python send_custom_message.py single --message "Your message here" --server SERVER_ID
 """
@@ -101,8 +101,10 @@ def broadcast_embed(message="Hello!"):
     global headers
     server_count = 0
     success_server_count = 0
+    data = {"embeds": [message]}
+    title = data["embeds"][0]["title"]
+    sent_ids = []
     for server_id, channel_id in server_channel_mapping.items():
-        data = {"embeds": [message]}
         response = requests.post(
             f"https://discord.com/api/v9/channels/{channel_id}/messages",
             headers=headers,
@@ -113,8 +115,17 @@ def broadcast_embed(message="Hello!"):
         )
         server_count += 1
         if response.status_code == 200:
+            json_response = response.json()
+            id = json_response["id"]
+            sent_ids.append([channel_id, id])
             success_server_count += 1
         time.sleep(2)
+    existing_sent_ids = {}
+    with open("sent_ids.json", "r") as f:
+        existing_sent_ids = json.loads(f.read())
+    with open("sent_ids.json", "w") as f:
+        existing_sent_ids[title] = sent_ids
+        f.write(json.dumps(existing_sent_ids))
     logger.info(
         f"Broadcasted embed stat {success_server_count}/{len(server_channel_mapping)}, {success_server_count/len(server_channel_mapping)*100}%"
     )

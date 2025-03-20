@@ -9,3 +9,4 @@ website
 *.env
 global_ranks.txt
 active_members.txt
+sent_ids.json
