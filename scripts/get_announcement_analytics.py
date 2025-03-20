@@ -1,6 +1,8 @@
 import json
 import requests
 import os
+from pprint import pprint
+import time
 
 headers = {
     "Authorization": f'Bot {os.getenv("BOT_TOKEN")}',
@@ -13,10 +15,8 @@ def get_analytics():
     with open("sent_ids.json", "r") as f:
         sent_embeds = json.loads(f.read())
 
+    result = {}
     for title in sent_embeds:
-        print(f"Title: {title}")
-        print(f"Sent to {len(sent_embeds[title])} servers")
-        # get reactions count
         total_reactions = 0
         total_replies = 0
         for channel_id, message_id in sent_embeds[title]:
@@ -31,12 +31,15 @@ def get_analytics():
                 )
                 total_replies += len(json_response.get("message_reference") or [])
 
-        return {
-            "title": title,
+        result[title] = {
             "sent_to": len(sent_embeds[title]),
             "total_reactions": total_reactions,
             "total_replies": total_replies,
         }
+    with open("post_performance.json", "w") as f:
+        f.write(json.dumps(result))
 
 
-print(get_analytics())
+if __name__ == "__main__":
+    get_analytics()
+    print("Outputted data to post_performance.json")
