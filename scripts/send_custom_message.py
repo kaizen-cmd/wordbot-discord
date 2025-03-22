@@ -119,7 +119,7 @@ def broadcast_embed(message="Hello!"):
             id = json_response["id"]
             sent_ids.append([channel_id, id])
             success_server_count += 1
-        time.sleep(2)
+        time.sleep(1)
     existing_sent_ids = {}
     with open("sent_ids.json", "r") as f:
         existing_sent_ids = json.loads(f.read())

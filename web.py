@@ -43,7 +43,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 # Add session middleware for managing sessions
-app.add_middleware(SessionMiddleware, secret_key="1qaz2wsx3edc4rfv")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
 
 # Set up templates
 templates = Jinja2Templates(directory="templates")

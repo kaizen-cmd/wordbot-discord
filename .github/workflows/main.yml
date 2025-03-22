@@ -42,12 +42,13 @@ jobs:
             sed -i "s/SUPPORT_SERVER_ID_VALUE/${{ secrets.SUPPORT_SERVER_ID }}/g" web.service
             sed -i "s/SUPPORT_SERVER_LOG_CHANNEL_ID_VALUE/${{ secrets.SUPPORT_SERVER_LOG_CHANNEL_ID }}/g" web.service
             sed -i "s/BOT_ID_VALUE/${{ secrets.BOT_ID }}/g" web.service
+            sed -i "s/SESSION_SECRET_KEY_VALUE/${{ secrets.SESSION_SECRET_KEY }}/g" web.service
 
             sed -i "s/BOT_TOKEN_VALUE/${{ secrets.BOT_TOKEN }}/g" wordchain.service
             sed -i "s/SLAV_USER_ID_VALUE/${{ secrets.SLAV_USER_ID }}/g" wordchain.service
             sed -i "s/SUPPORT_SERVER_ID_VALUE/${{ secrets.SUPPORT_SERVER_ID }}/g" wordchain.service
             sed -i "s/SUPPORT_SERVER_LOG_CHANNEL_ID_VALUE/${{ secrets.SUPPORT_SERVER_LOG_CHANNEL_ID }}/g" wordchain.service
-            sed -i "s/BOT_ID_VALUE/${{ secrets.BOT_ID }}/g" web.service
+            sed -i "s/BOT_ID_VALUE/${{ secrets.BOT_ID }}/g" wordchain.service
 
             sudo cp wordchain.service /etc/systemd/system/wordchain.service
             sudo cp web.service /etc/systemd/system/web.service

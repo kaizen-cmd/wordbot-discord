@@ -5,13 +5,15 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/wordbot-discord
-ExecStart=/home/ubuntu/wordbot-discord/venv/bin/uvicorn web:app --host 127.0.0.1 --port 5000
+ExecStart=/home/ubuntu/wordbot-discord/venv/bin/uvicorn web:app --workers 1 --host 127.0.0.1 --port 5000
 Restart=always
 Environment="BOT_TOKEN=BOT_TOKEN_VALUE"
 Environment="SLAV_USER_ID=SLAV_USER_ID_VALUE"
 Environment="SUPPORT_SERVER_ID=SUPPORT_SERVER_ID_VALUE"
 Environment="SUPPORT_SERVER_LOG_CHANNEL_ID=SUPPORT_SERVER_LOG_CHANNEL_ID_VALUE"
 Environment="BOT_ID=BOT_ID_VALUE"
+Environment="SESSION_SECRET_KEY=SESSION_SECRET_KEY_VALUE"
+
 
 [Install]
 WantedBy=multi-user.target
